@@ -1,0 +1,67 @@
+package venusians.data.board.buildable;
+
+import java.util.HashMap;
+import javafx.scene.image.Image;
+import venusians.data.Point;
+import venusians.data.board.Board;
+import venusians.data.board.Board.PositionType;
+import venusians.data.board.TileKind;
+import venusians.data.cards.resource.ResourceCard;
+
+public class Settlement implements Buildable {
+
+  private static final Image image = new Image("");
+  public static final HashMap<ResourceCard, Integer> blueprint = new HashMap<ResourceCard, Integer>();
+
+  {
+    blueprint.put(ResourceCard.BRICK, 1);
+    blueprint.put(ResourceCard.WOOD, 1);
+    blueprint.put(ResourceCard.WHEAT, 1);
+    blueprint.put(ResourceCard.WOOL, 1);
+  }
+
+  private Point position;
+  private PositionType positionType;
+
+  public Settlement(Point position) {
+    this.position = position;
+    this.positionType = PositionType.valueOf(position);
+    if (positionType == PositionType.TILE) {
+      throw new IllegalArgumentException("This position is of type TILE");
+    }
+  }
+
+  @Override
+  public Point getPosition() {
+    return position;
+  }
+
+  public static HashMap<ResourceCard, Integer> getBlueprint() {
+    return blueprint;
+  }
+
+  @Override
+  public Image getImage() {
+    return image;
+  }
+
+  public HashMap<ResourceCard, Integer> getResources() {
+    HashMap<ResourceCard, Integer> result = new HashMap<ResourceCard, Integer>();
+    TileKind[][] map = Board.getMap();
+    for (
+      int i = positionType == PositionType.EVEN_CORNER ? 0 : 1;
+      i < Board.firstOrderOffsets.length;
+      i += 2
+    ) {
+      Point offset = Board.firstOrderOffsets[i];
+      Point newPosition = position.plus(offset);
+      TileKind tile = map[newPosition.x][newPosition.y];
+      if (tile instanceof ResourceCard) {
+        ResourceCard resource = (ResourceCard) tile;
+        int oldValue = result.getOrDefault(resource, 0);
+        result.put(resource, oldValue);
+      }
+    }
+    return result;
+  }
+}
