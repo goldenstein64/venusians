@@ -9,8 +9,9 @@ public class Event<A> {
 
   private HashSet<EventListener<A>> listeners = new HashSet<EventListener<A>>();
 
-  public void connect(EventListener<A> listener) {
+  public EventListener<A> connect(EventListener<A> listener) {
     listeners.add(listener);
+    return listener;
   }
 
   public void disconnect(EventListener<A> listener) {
