@@ -63,18 +63,18 @@ public class Board {
       UPGRADED,
     }
 
-    public Buildable fromBuildable;
-    public Buildable toBuildable;
+    public Buildable from;
+    public Buildable to;
     public ActionType actionType;
 
     public MapChangedArgs(Buildable buildable) {
-      this.toBuildable = buildable;
+      this.to = buildable;
       this.actionType = ActionType.ADDED;
     }
 
     public MapChangedArgs(Buildable from, Buildable to) {
-      this.fromBuildable = from;
-      this.toBuildable = to;
+      this.from = from;
+      this.to = to;
       this.actionType = ActionType.UPGRADED;
     }
   }
@@ -82,10 +82,15 @@ public class Board {
   public static void setUp() {
     GameOptions gameOptions = Game.getGameOptions();
 
+    setUpMap(gameOptions);
+  }
+
+  private static void setUpMap(GameOptions gameOptions) {
     MapPreset mapPreset = MapPreset.CLASSIC;
+    MapSlot[] slots = deepCloneSlots(mapPreset.getSlots());
 
     map = new MapSlot[13][13];
-    MapSlot[] slots = deepCloneSlots(mapPreset.getSlots());
+
     if (gameOptions.randomizeSlotPositions) {
       randomizeSlotPositions(slots);
     }
@@ -94,7 +99,7 @@ public class Board {
       randomizeRollValues(slots);
     }
 
-    setMap(slots);
+    setMapToSlots(slots);
   }
 
   private static MapSlot[] deepCloneSlots(MapSlot[] slots) {
@@ -132,7 +137,7 @@ public class Board {
     }
   }
 
-  private static void setMap(MapSlot[] slots) {
+  private static void setMapToSlots(MapSlot[] slots) {
     for (MapSlot slot : slots) {
       map[slot.position.x][slot.position.y] = slot;
     }
