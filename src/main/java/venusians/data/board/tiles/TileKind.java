@@ -1,4 +1,4 @@
-package venusians.data.board;
+package venusians.data.board.tiles;
 
 import javafx.scene.image.Image;
 

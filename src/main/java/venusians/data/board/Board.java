@@ -1,17 +1,19 @@
 package venusians.data.board;
 
 import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedList;
+import venusians.data.Game;
 import venusians.data.Point;
 import venusians.data.board.buildable.Buildable;
+import venusians.data.board.tiles.MapPreset;
+import venusians.data.board.tiles.MapSlot;
+import venusians.data.lifecycle.GameOptions;
 import venusians.util.Event;
 
 public class Board {
 
   private static SecureRandom rng = new SecureRandom();
-  private static TileKind[][] map;
+  private static MapSlot[][] map;
   private static HashSet<Buildable> allBuildables = new HashSet<Buildable>();
   private static Point robberPosition;
 
@@ -78,34 +80,65 @@ public class Board {
   }
 
   public static void setUp() {
-    // create the map of tiles
+    GameOptions gameOptions = Game.getGameOptions();
 
-    // from a preset
     MapPreset mapPreset = MapPreset.CLASSIC;
 
-    map = new TileKind[13][13];
-    if (mapPreset.isRandomized()) {
-      DefinedTile[] tiles = mapPreset.getTiles();
-      DefinedTile[] newTiles = tiles.clone();
-      for (int i = 0; i < newTiles.length; i++) {
-        tiles[i] = tiles[i].clone();
-      }
-      for (int i = 0; i < newTiles.length; i++) {
-        DefinedTile tile1 = newTiles[i];
-        int choice = rng.nextInt(newTiles.length);
-        DefinedTile tile2 = newTiles[choice];
-        Point temp = tile1.position;
-        tile1.position = tile2.position;
-        tile2.position = temp;
-      }
-    } else {
-      for (DefinedTile tile : mapPreset.getTiles()) {
-        map[tile.position.x][tile.position.y] = tile.kind;
+    map = new MapSlot[13][13];
+    MapSlot[] slots = deepCloneSlots(mapPreset.getSlots());
+    if (gameOptions.randomizeSlotPositions) {
+      randomizeSlotPositions(slots);
+    }
+
+    if (gameOptions.randomizeRollValues) {
+      randomizeRollValues(slots);
+    }
+
+    setMap(slots);
+  }
+
+  private static MapSlot[] deepCloneSlots(MapSlot[] slots) {
+    MapSlot[] newSlots = slots.clone();
+    for (int i = 0; i < newSlots.length; i++) {
+      slots[i] = slots[i].clone();
+    }
+    return newSlots;
+  }
+
+  private static void randomizeSlotPositions(MapSlot[] slots) {
+    for (int i = 0; i < slots.length; i++) {
+      int choice = rng.nextInt(slots.length);
+      MapSlot slot1 = slots[i];
+      MapSlot slot2 = slots[choice];
+
+      // swap the position on each slot
+      Point tempPosition = slot1.position;
+      slot1.position = slot2.position;
+      slot2.position = tempPosition;
+    }
+  }
+
+  private static void randomizeRollValues(MapSlot[] slots) {
+    for (int i = 0; i < slots.length; i++) {
+      int choice = rng.nextInt(slots.length);
+      MapSlot slot1 = slots[i];
+      MapSlot slot2 = slots[choice];
+
+      if (slot1.rollValue != -1 && slot2.rollValue != -1) {
+        int tempRollValue = slot1.rollValue;
+        slot1.rollValue = slot2.rollValue;
+        slot2.rollValue = tempRollValue;
       }
     }
   }
 
-  public static TileKind[][] getMap() {
+  private static void setMap(MapSlot[] slots) {
+    for (MapSlot slot : slots) {
+      map[slot.position.x][slot.position.y] = slot;
+    }
+  }
+
+  public static MapSlot[][] getMap() {
     return map;
   }
 

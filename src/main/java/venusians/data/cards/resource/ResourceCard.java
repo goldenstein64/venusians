@@ -1,7 +1,7 @@
 package venusians.data.cards.resource;
 
 import javafx.scene.image.Image;
-import venusians.data.board.TileKind;
+import venusians.data.board.tiles.TileKind;
 
 public enum ResourceCard implements TileKind {
   // STUB

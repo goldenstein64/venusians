@@ -5,7 +5,8 @@ import javafx.scene.image.Image;
 import venusians.data.Point;
 import venusians.data.board.Board;
 import venusians.data.board.Board.PositionType;
-import venusians.data.board.TileKind;
+import venusians.data.board.tiles.MapSlot;
+import venusians.data.board.tiles.TileKind;
 import venusians.data.cards.resource.ResourceCard;
 
 public class Settlement implements Buildable {
@@ -47,7 +48,7 @@ public class Settlement implements Buildable {
 
   public HashMap<ResourceCard, Integer> getResources() {
     HashMap<ResourceCard, Integer> result = new HashMap<ResourceCard, Integer>();
-    TileKind[][] map = Board.getMap();
+    MapSlot[][] map = Board.getMap();
     for (
       int i = positionType == PositionType.EVEN_CORNER ? 0 : 1;
       i < Board.firstOrderOffsets.length;
@@ -55,9 +56,9 @@ public class Settlement implements Buildable {
     ) {
       Point offset = Board.firstOrderOffsets[i];
       Point newPosition = position.plus(offset);
-      TileKind tile = map[newPosition.x][newPosition.y];
-      if (tile instanceof ResourceCard) {
-        ResourceCard resource = (ResourceCard) tile;
+      MapSlot tile = map[newPosition.x][newPosition.y];
+      if (tile.kind instanceof ResourceCard) {
+        ResourceCard resource = (ResourceCard) tile.kind;
         int oldValue = result.getOrDefault(resource, 0);
         result.put(resource, oldValue);
       }

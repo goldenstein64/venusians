@@ -8,4 +8,6 @@ public class GameOptions {
   public int playerCount;
   public String[] names;
   public ArrayList<Extension> extensions;
+  public boolean randomizeSlotPositions = false;
+  public boolean randomizeRollValues = false;
 }
