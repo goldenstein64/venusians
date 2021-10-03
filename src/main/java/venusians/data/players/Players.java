@@ -1,7 +1,6 @@
 package venusians.data.players;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import javafx.scene.paint.Color;
 import venusians.data.Game;
 import venusians.data.lifecycle.GameOptions;

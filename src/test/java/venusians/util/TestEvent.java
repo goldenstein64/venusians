@@ -2,11 +2,9 @@ package venusians.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 public class TestEvent {
@@ -91,7 +89,7 @@ public class TestEvent {
 
     int[] obj = new int[] { -1 };
 
-    Event.Listener<Integer> connection = intEvent.connect(
+    intEvent.connect(
       (Integer value) -> {
         obj[0] = value;
       }

@@ -6,7 +6,6 @@ import venusians.data.Point;
 import venusians.data.board.Board;
 import venusians.data.board.Board.PositionType;
 import venusians.data.board.tiles.MapSlot;
-import venusians.data.board.tiles.TileKind;
 import venusians.data.cards.resource.ResourceCard;
 
 public class Settlement implements Buildable {
