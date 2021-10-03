@@ -7,28 +7,28 @@ import java.util.HashSet;
  */
 public class Event<A> {
 
-  private HashSet<EventListener<A>> listeners = new HashSet<EventListener<A>>();
+  private HashSet<Listener<A>> listeners = new HashSet<Listener<A>>();
 
-  public EventListener<A> connect(EventListener<A> listener) {
+  public Listener<A> connect(Listener<A> listener) {
     listeners.add(listener);
     return listener;
   }
 
-  public void disconnect(EventListener<A> listener) {
+  public void disconnect(Listener<A> listener) {
     listeners.remove(listener);
   }
 
-  public boolean isConnected(EventListener<A> listener) {
+  public boolean isConnected(Listener<A> listener) {
     return listeners.contains(listener);
   }
 
   public void fire(A argument) {
-    for (EventListener<A> listener : listeners) {
+    for (Listener<A> listener : listeners) {
       listener.onFired(argument);
     }
   }
 
-  public interface EventListener<A> {
+  public interface Listener<A> {
     public void onFired(A argument);
   }
 }

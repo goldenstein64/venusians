@@ -1,26 +1,35 @@
 package venusians.data.players;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import javafx.scene.paint.Color;
 import venusians.data.Game;
 import venusians.data.lifecycle.GameOptions;
+import venusians.data.lifecycle.PlayerProfile;
 
 public class Players {
 
   private static SecureRandom rng = new SecureRandom();
-  private static Player[] allPlayers = new Player[6];
-  private static int playerCount = 0;
+  private static Player[] allPlayers;
   private static Player currentPlayer;
   private static int currentIndex;
 
-  public static void setUp() {
+  public static void startGame() {
     GameOptions gameOptions = Game.getGameOptions();
-    playerCount = gameOptions.playerCount;
+    allPlayers = new Player[gameOptions.profiles.size()];
+    for (int i = 0; i < allPlayers.length; i++) {
+      PlayerProfile profile = gameOptions.profiles.get(i);
+      allPlayers[i] = new Player(profile.name, profile.color);
+    }
     setFirstPlayer();
   }
 
   public static Player[] getPlayers() {
-    return allPlayers;
+    return (Player[]) allPlayers;
+  }
+
+  public static int getPlayerCount() {
+    return allPlayers.length;
   }
 
   public static Player getCurrentPlayer() {
@@ -45,7 +54,7 @@ public class Players {
   }
 
   private static void setFirstPlayer() {
-    currentIndex = rng.nextInt(playerCount);
+    currentIndex = rng.nextInt(allPlayers.length);
     currentPlayer = Players.getPlayers()[currentIndex];
   }
 }

@@ -10,16 +10,16 @@
 	spacing="20.0"
 	xmlns="http://javafx.com/javafx/8.0.171"
 	xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="venusians.PrimaryController"
+	fx:controller="venusians.MainGameController"
 >
 	<children>
 		<Label
-			text="Primary View"
+			text="Main Game"
 		 />
 		<Button
-			fx:id="primaryButton"
-			text="Switch to Secondary View"
-			onAction="#switchToSecondary"
+			fx:id="secondaryButton"
+			text="Switch to Results"
+			onAction="#gameEnded"
 		 />
 	</children>
 	<padding>

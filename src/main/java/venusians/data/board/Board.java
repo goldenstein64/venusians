@@ -79,7 +79,7 @@ public class Board {
     }
   }
 
-  public static void setUp() {
+  public static void startGame() {
     GameOptions gameOptions = Game.getGameOptions();
 
     setUpMap(gameOptions);
@@ -91,7 +91,7 @@ public class Board {
 
     map = new MapSlot[13][13];
 
-    if (gameOptions.randomizeSlotPositions) {
+    if (gameOptions.randomizeTilePositions) {
       randomizeSlotPositions(slots);
     }
 

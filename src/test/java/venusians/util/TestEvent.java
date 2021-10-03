@@ -26,7 +26,7 @@ public class TestEvent {
   @Test
   void eventCanBeListenedTo() {
     Event<String> stringEvent = new Event<String>();
-    Event.EventListener<String> connection = stringEvent.connect(
+    Event.Listener<String> connection = stringEvent.connect(
       (String value) -> {
         System.out.printf("RECEIVED: %s%n", value);
       }
@@ -35,9 +35,32 @@ public class TestEvent {
     assertNotNull(connection);
   }
 
+  @Test
+  void eventCanBeListenedToTwiceAndFired() {
+    Event<Integer> intEvent = new Event<Integer>();
+
+    int[] obj = new int[] { -1 };
+
+    intEvent.connect(
+      (Integer value) -> {
+        obj[0] += value;
+      }
+    );
+
+    intEvent.connect(
+      (Integer value) -> {
+        obj[0] += value;
+      }
+    );
+
+    intEvent.fire(3);
+
+    assertEquals(obj[0], 5);
+  }
+
   void eventCanCheckWhetherListenerIsConnected() {
     Event<String> stringEvent = new Event<String>();
-    Event.EventListener<String> connection = stringEvent.connect(
+    Event.Listener<String> connection = stringEvent.connect(
       (String value) -> {
         System.out.printf("RECEIVED: %s%n", value);
       }
@@ -49,11 +72,13 @@ public class TestEvent {
   @Test
   void eventCanBeDisconnected() {
     Event<String> stringEvent = new Event<String>();
-    Event.EventListener<String> connection = stringEvent.connect(
+    Event.Listener<String> connection = stringEvent.connect(
       (String value) -> {
         System.out.printf("RECEIVED: %s%n", value);
       }
     );
+
+    assertTrue(stringEvent.isConnected(connection));
 
     stringEvent.disconnect(connection);
 
@@ -62,20 +87,39 @@ public class TestEvent {
 
   @Test
   void eventCanBeListenedToAndFired() {
-    Event<Integer> stringEvent = new Event<Integer>();
+    Event<Integer> intEvent = new Event<Integer>();
 
     int[] obj = new int[] { -1 };
 
-    Event.EventListener<Integer> connection = stringEvent.connect(
+    Event.Listener<Integer> connection = intEvent.connect(
       (Integer value) -> {
         obj[0] = value;
       }
     );
 
-    stringEvent.connect(connection);
-
-    stringEvent.fire(5);
+    intEvent.fire(5);
 
     assertEquals(obj[0], 5);
+  }
+
+  @Test
+  void eventConnectedThenDisconnected() {
+    Event<Integer> intEvent = new Event<Integer>();
+
+    int[] obj = new int[] { -1 };
+
+    Event.Listener<Integer> connection = intEvent.connect(
+      (Integer value) -> {
+        obj[0] = value;
+      }
+    );
+
+    intEvent.fire(1);
+
+    intEvent.disconnect(connection);
+
+    intEvent.fire(3);
+
+    assertEquals(obj[0], 1);
   }
 }

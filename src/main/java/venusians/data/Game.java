@@ -1,9 +1,9 @@
 package venusians.data;
 
-import java.util.Random;
+import venusians.data.board.Board;
 import venusians.data.lifecycle.GameOptions;
 import venusians.data.lifecycle.GameResults;
-import venusians.data.players.Player;
+import venusians.data.lifecycle.PlayerProfile;
 import venusians.data.players.Players;
 
 /**
@@ -11,8 +11,8 @@ import venusians.data.players.Players;
  */
 public class Game {
 
-  private static GameOptions gameOptions;
-  private static GameResults gameResults;
+  private static GameOptions gameOptions = new GameOptions();
+  private static GameResults gameResults = new GameResults();
 
   public static GameOptions getGameOptions() {
     return gameOptions;
@@ -22,8 +22,17 @@ public class Game {
     return gameResults;
   }
 
-  public static void setUp() {
-    Players.setUp();
+  public static void addPlayerProfile(PlayerProfile profile) {
+    gameOptions.profiles.add(profile);
+  }
+
+  public static void removePlayerProfile(PlayerProfile profile) {
+    gameOptions.profiles.remove(profile);
+  }
+
+  public static void startGame() {
+    Players.startGame();
+    Board.startGame();
   }
 
   public static void resetData() {
