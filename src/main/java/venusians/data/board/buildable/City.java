@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import venusians.data.Point;
 import venusians.data.cards.resource.ResourceCard;
+import venusians.data.players.Player;
 
 public class City extends Settlement {
 
@@ -18,8 +19,8 @@ public class City extends Settlement {
     return blueprint;
   }
 
-  public City(Point position) {
-    super(position);
+  public City(Player owner, Point position) {
+    super(owner, position);
   }
 
   @Override

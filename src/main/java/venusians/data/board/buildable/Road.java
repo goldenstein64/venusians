@@ -4,6 +4,7 @@ import java.util.HashMap;
 import javafx.scene.image.Image;
 import venusians.data.Point;
 import venusians.data.cards.resource.ResourceCard;
+import venusians.data.players.Player;
 
 public class Road implements Buildable {
 
@@ -17,8 +18,10 @@ public class Road implements Buildable {
 
   private Point position1;
   private Point position2;
+  private Player owner;
 
-  public Road(Point position1, Point position2) {
+  public Road(Player owner, Point position1, Point position2) {
+    this.owner = owner;
     this.position1 = position1;
     this.position2 = position2;
   }
@@ -32,8 +35,20 @@ public class Road implements Buildable {
     return position1;
   }
 
+  public Point getPosition1() {
+    return position1;
+  }
+
+  public Point getPosition2() {
+    return position2;
+  }
+
   @Override
   public Image getImage() {
     return image;
+  }
+
+  public Player getOwner() {
+    return owner;
   }
 }

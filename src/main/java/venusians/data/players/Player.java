@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import javafx.scene.paint.Color;
 import venusians.data.Point;
 import venusians.data.board.Board;
+import venusians.data.board.buildable.Buildable;
 import venusians.data.board.buildable.City;
 import venusians.data.board.buildable.Road;
 import venusians.data.board.buildable.Settlement;
@@ -85,13 +86,40 @@ public class Player {
 
   public void buildRoad(Point position1, Point position2) {
     useResources(Road.getBlueprint());
-    Road newRoad = new Road(position1, position2);
+    Road newRoad = new Road(this, position1, position2);
     Board.addBuildable(newRoad);
   }
 
   public void buildSettlement(Point position) {
+    throwIfPositionIsntConnectedByRoad(position);
+
     useResources(Settlement.getBlueprint());
-    Settlement newSettlement = new Settlement(position);
+    buildStartingSettlement(position);
+  }
+
+  private void throwIfPositionIsntConnectedByRoad(Point position) {
+    boolean hasConnection = false;
+    for (Buildable buildable : Board.getBuildables()) {
+      if (buildable.getOwner() == this && buildable instanceof Road) {
+        Road road = (Road) buildable;
+        if (
+          road.getPosition1().equals(position) ||
+          road.getPosition2().equals(position)
+        ) {
+          hasConnection = true;
+          break;
+        }
+      }
+    }
+    if (!hasConnection) {
+      throw new IllegalArgumentException(
+        "This position is not connected by a road."
+      );
+    }
+  }
+
+  public void buildStartingSettlement(Point position) {
+    Settlement newSettlement = new Settlement(this, position);
     Board.addBuildable(newSettlement);
   }
 
@@ -99,7 +127,7 @@ public class Player {
     throwIfSettlementIsntOnBoard(settlement);
 
     useResources(City.getBlueprint());
-    City newCity = new City(settlement.getPosition());
+    City newCity = new City(this, settlement.getPosition());
     Board.upgradeBuildable(settlement, newCity);
   }
 

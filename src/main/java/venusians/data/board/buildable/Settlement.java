@@ -7,6 +7,7 @@ import venusians.data.board.Board;
 import venusians.data.board.Board.PositionType;
 import venusians.data.board.tiles.MapSlot;
 import venusians.data.cards.resource.ResourceCard;
+import venusians.data.players.Player;
 
 public class Settlement implements Buildable {
 
@@ -22,8 +23,10 @@ public class Settlement implements Buildable {
 
   private Point position;
   private PositionType positionType;
+  private Player owner;
 
-  public Settlement(Point position) {
+  public Settlement(Player owner, Point position) {
+    this.owner = owner;
     this.position = position;
     this.positionType = PositionType.valueOf(position);
     if (positionType == PositionType.TILE) {
@@ -43,6 +46,11 @@ public class Settlement implements Buildable {
   @Override
   public Image getImage() {
     return image;
+  }
+
+  @Override
+  public Player getOwner() {
+    return owner;
   }
 
   public HashMap<ResourceCard, Integer> getResources() {

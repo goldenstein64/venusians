@@ -13,6 +13,10 @@ public class Point {
     this.y = y;
   }
 
+  public boolean equals(Point other) {
+    return this.x == other.x && this.y == other.y;
+  }
+
   public Point plus(Point other) {
     return new Point(this.x + other.x, this.y + other.y);
   }
