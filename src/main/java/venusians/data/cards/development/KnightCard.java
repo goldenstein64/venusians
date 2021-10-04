@@ -20,7 +20,7 @@ public class KnightCard extends DevelopmentCard {
   }
 
   public void apply() {
-    // move the robber.
+    // choose a place to move the robber.
     // if the robber lands next to a settlement, choose one and steal a resource from its owner.
   }
 }

@@ -14,8 +14,6 @@ public class VictoryPointCard extends DevelopmentCard {
 
   public VictoryPointCard(Player owner) {
     this.owner = owner;
-
-    // TODO: randomize name and image
     this.name = "Library";
     this.cardImage = new Image("");
   }

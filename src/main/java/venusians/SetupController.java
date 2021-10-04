@@ -62,10 +62,6 @@ public class SetupController {
       }
     );
 
-    // TODO: Add functionality for deleting and adding players
-    // add an icon for deleting a row
-    // and add an empty field that implies you can add a new row
-
     profileList =
       FXCollections.observableArrayList(
         new PlayerProfile("James", Color.WHITE)
