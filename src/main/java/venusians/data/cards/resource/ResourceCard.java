@@ -4,7 +4,6 @@ import javafx.scene.image.Image;
 import venusians.data.board.tiles.TileKind;
 
 public enum ResourceCard implements TileKind {
-  // STUB
   WOOD(new Image(""), new Image("")),
   WOOL(new Image(""), new Image("")),
   WHEAT(new Image(""), new Image("")),
