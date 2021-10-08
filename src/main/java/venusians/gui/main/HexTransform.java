@@ -1,4 +1,4 @@
-package venusians.gui;
+package venusians.gui.main;
 
 import venusians.data.Point;
 

@@ -14,7 +14,7 @@
 	spacing="20.0"
 	xmlns="http://javafx.com/javafx/8.0.171"
 	xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="venusians.SetupController"
+	fx:controller="venusians.gui.setup.SetupController"
 >
 	<children>
 		<TableView

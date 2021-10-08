@@ -1,4 +1,4 @@
-package venusians;
+package venusians.gui.main;
 
 import java.io.IOException;
 import javafx.fxml.FXML;
@@ -9,8 +9,7 @@ import venusians.data.Game;
 import venusians.data.Point;
 import venusians.data.board.Board;
 import venusians.data.board.tiles.MapSlot;
-import venusians.data.cards.resource.ResourceCard;
-import venusians.gui.HexTransform;
+import venusians.gui.App;
 
 public class MainGameController {
 
@@ -20,13 +19,18 @@ public class MainGameController {
   private AnchorPane mapPane;
 
   @FXML
-  private void gameEnded() throws IOException {
+  private void endGame() throws IOException {
     App.setRoot("results");
   }
 
   @FXML
   private void initialize() {
     Game.startGame();
+
+    createMap();
+  }
+
+  private void createMap() {
     for (MapSlot[] row : Board.getMap()) {
       for (MapSlot tile : row) {
         if (tile == null) {

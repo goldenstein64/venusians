@@ -1,4 +1,4 @@
-package venusians;
+package venusians.gui;
 
 import java.io.IOException;
 import javafx.application.Application;
@@ -22,7 +22,7 @@ public class App extends Application {
     stage.show();
   }
 
-  static void setRoot(String fxml) throws IOException {
+  public static void setRoot(String fxml) throws IOException {
     scene.setRoot(loadFXML(fxml));
   }
 

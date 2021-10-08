@@ -65,7 +65,7 @@
                         <!-- Usage: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>venusians.App</mainClass>
+                            <mainClass>venusians.gui.App</mainClass>
                         </configuration>
                     </execution>
                 </executions>

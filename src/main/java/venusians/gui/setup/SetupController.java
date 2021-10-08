@@ -1,4 +1,4 @@
-package venusians;
+package venusians.gui.setup;
 
 import java.io.IOException;
 import javafx.collections.FXCollections;
@@ -13,6 +13,7 @@ import javafx.scene.paint.Color;
 import venusians.data.Game;
 import venusians.data.lifecycle.GameOptions;
 import venusians.data.lifecycle.PlayerProfile;
+import venusians.gui.App;
 import venusians.gui.ColorTableCell;
 
 public class SetupController {
