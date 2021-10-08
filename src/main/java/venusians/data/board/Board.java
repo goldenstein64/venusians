@@ -3,6 +3,7 @@ package venusians.data.board;
 import java.security.SecureRandom;
 import java.util.HashSet;
 import venusians.data.Game;
+import venusians.data.IntPoint;
 import venusians.data.Point;
 import venusians.data.board.buildable.Buildable;
 import venusians.data.board.tiles.MapPreset;
@@ -18,23 +19,23 @@ public class Board {
   private static Point robberPosition;
 
   /** Lists all offsets that are 2 units away */
-  public static final Point[] secondOrderOffsets = new Point[] {
-    new Point(1, 2),
-    new Point(2, 1),
-    new Point(1, -1),
-    new Point(-1, -2),
-    new Point(-2, -1),
-    new Point(-1, 1),
+  public static final IntPoint[] secondOrderOffsets = new IntPoint[] {
+    new IntPoint(1, 2),
+    new IntPoint(2, 1),
+    new IntPoint(1, -1),
+    new IntPoint(-1, -2),
+    new IntPoint(-2, -1),
+    new IntPoint(-1, 1),
   };
 
   /** Lists all offsets that are 1 unit away */
-  public static final Point[] firstOrderOffsets = new Point[] {
-    new Point(1, 1),
-    new Point(1, 0),
-    new Point(0, -1),
-    new Point(-1, -1),
-    new Point(-1, 0),
-    new Point(0, 1),
+  public static final IntPoint[] firstOrderOffsets = new IntPoint[] {
+    new IntPoint(1, 1),
+    new IntPoint(1, 0),
+    new IntPoint(0, -1),
+    new IntPoint(-1, -1),
+    new IntPoint(-1, 0),
+    new IntPoint(0, 1),
   };
 
   public static enum PositionType {
@@ -42,7 +43,7 @@ public class Board {
     EVEN_CORNER,
     ODD_CORNER;
 
-    public static PositionType valueOf(Point position) {
+    public static PositionType valueOf(IntPoint position) {
       switch ((position.x - position.y) % 3) {
         case 0:
           return TILE;
@@ -117,7 +118,7 @@ public class Board {
       MapSlot slot2 = slots[choice];
 
       // swap the position on each slot
-      Point tempPosition = slot1.position;
+      IntPoint tempPosition = slot1.position;
       slot1.position = slot2.position;
       slot2.position = tempPosition;
     }

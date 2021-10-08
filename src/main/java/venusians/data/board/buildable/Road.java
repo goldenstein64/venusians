@@ -2,7 +2,7 @@ package venusians.data.board.buildable;
 
 import java.util.HashMap;
 import javafx.scene.image.Image;
-import venusians.data.Point;
+import venusians.data.IntPoint;
 import venusians.data.cards.resource.ResourceCard;
 import venusians.data.players.Player;
 
@@ -16,11 +16,11 @@ public class Road implements Buildable {
     blueprint.put(ResourceCard.BRICK, 1);
   }
 
-  private Point position1;
-  private Point position2;
+  private IntPoint position1;
+  private IntPoint position2;
   private Player owner;
 
-  public Road(Player owner, Point position1, Point position2) {
+  public Road(Player owner, IntPoint position1, IntPoint position2) {
     this.owner = owner;
     this.position1 = position1;
     this.position2 = position2;
@@ -31,15 +31,15 @@ public class Road implements Buildable {
   }
 
   @Override
-  public Point getPosition() {
+  public IntPoint getPosition() {
     return position1;
   }
 
-  public Point getPosition1() {
+  public IntPoint getPosition1() {
     return position1;
   }
 
-  public Point getPosition2() {
+  public IntPoint getPosition2() {
     return position2;
   }
 

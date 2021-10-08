@@ -2,7 +2,7 @@ package venusians.data.board.buildable;
 
 import java.util.HashMap;
 import javafx.scene.image.Image;
-import venusians.data.Point;
+import venusians.data.IntPoint;
 import venusians.data.board.Board;
 import venusians.data.board.Board.PositionType;
 import venusians.data.board.tiles.MapSlot;
@@ -21,11 +21,11 @@ public class Settlement implements Buildable {
     blueprint.put(ResourceCard.WOOL, 1);
   }
 
-  private Point position;
+  private IntPoint position;
   private PositionType positionType;
   private Player owner;
 
-  public Settlement(Player owner, Point position) {
+  public Settlement(Player owner, IntPoint position) {
     this.owner = owner;
     this.position = position;
     this.positionType = PositionType.valueOf(position);
@@ -35,7 +35,7 @@ public class Settlement implements Buildable {
   }
 
   @Override
-  public Point getPosition() {
+  public IntPoint getPosition() {
     return position;
   }
 
@@ -61,8 +61,8 @@ public class Settlement implements Buildable {
       i < Board.firstOrderOffsets.length;
       i += 2
     ) {
-      Point offset = Board.firstOrderOffsets[i];
-      Point newPosition = position.plus(offset);
+      IntPoint offset = Board.firstOrderOffsets[i];
+      IntPoint newPosition = position.plus(offset);
       MapSlot tile = map[newPosition.x][newPosition.y];
       if (tile.kind instanceof ResourceCard) {
         ResourceCard resource = (ResourceCard) tile.kind;

@@ -5,10 +5,10 @@ package venusians.data;
  */
 public class Point {
 
-  public final int x;
-  public final int y;
+  public final double x;
+  public final double y;
 
-  public Point(int x, int y) {
+  public Point(double x, double y) {
     this.x = x;
     this.y = y;
   }
@@ -35,5 +35,9 @@ public class Point {
 
   public Point times(int scalar) {
     return new Point(this.x * scalar, this.y * scalar);
+  }
+
+  public IntPoint asInt() {
+    return new IntPoint((int) x, (int) y);
   }
 }

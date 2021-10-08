@@ -1,30 +1,30 @@
 package venusians.data.board.tiles;
 
-import venusians.data.Point;
+import venusians.data.IntPoint;
 import venusians.data.cards.resource.ResourceCard;
 
 public enum MapPreset {
   CLASSIC(
     new MapSlot[] {
-      new MapSlot(new Point(1, 7), ResourceCard.WHEAT, 9),
-      new MapSlot(new Point(2, 8), ResourceCard.WOOD, 8),
-      new MapSlot(new Point(3, 9), ResourceCard.BRICK, 5),
-      new MapSlot(new Point(2, 5), ResourceCard.WHEAT, 12),
-      new MapSlot(new Point(3, 6), ResourceCard.WOOD, 11),
-      new MapSlot(new Point(4, 7), ResourceCard.ORE, 3),
-      new MapSlot(new Point(5, 8), ResourceCard.WHEAT, 6),
-      new MapSlot(new Point(3, 3), ResourceCard.ORE, 10),
-      new MapSlot(new Point(4, 4), ResourceCard.BRICK, 6),
-      new MapSlot(new Point(5, 5), ExtraTileKind.DESERT, -1),
-      new MapSlot(new Point(6, 6), ResourceCard.WHEAT, 4),
-      new MapSlot(new Point(7, 7), ResourceCard.WOOL, 11),
-      new MapSlot(new Point(5, 2), ResourceCard.WOOL, 2),
-      new MapSlot(new Point(6, 3), ResourceCard.WOOL, 4),
-      new MapSlot(new Point(7, 4), ResourceCard.WOOD, 3),
-      new MapSlot(new Point(8, 5), ResourceCard.WOOL, 5),
-      new MapSlot(new Point(7, 1), ResourceCard.WOOD, 9),
-      new MapSlot(new Point(8, 2), ResourceCard.BRICK, 10),
-      new MapSlot(new Point(9, 3), ResourceCard.ORE, 8),
+      new MapSlot(new IntPoint(1, 7), ResourceCard.WHEAT, 9),
+      new MapSlot(new IntPoint(2, 8), ResourceCard.WOOD, 8),
+      new MapSlot(new IntPoint(3, 9), ResourceCard.BRICK, 5),
+      new MapSlot(new IntPoint(2, 5), ResourceCard.WHEAT, 12),
+      new MapSlot(new IntPoint(3, 6), ResourceCard.WOOD, 11),
+      new MapSlot(new IntPoint(4, 7), ResourceCard.ORE, 3),
+      new MapSlot(new IntPoint(5, 8), ResourceCard.WHEAT, 6),
+      new MapSlot(new IntPoint(3, 3), ResourceCard.ORE, 10),
+      new MapSlot(new IntPoint(4, 4), ResourceCard.BRICK, 6),
+      new MapSlot(new IntPoint(5, 5), ExtraTileKind.DESERT, -1),
+      new MapSlot(new IntPoint(6, 6), ResourceCard.WHEAT, 4),
+      new MapSlot(new IntPoint(7, 7), ResourceCard.WOOL, 11),
+      new MapSlot(new IntPoint(5, 2), ResourceCard.WOOL, 2),
+      new MapSlot(new IntPoint(6, 3), ResourceCard.WOOL, 4),
+      new MapSlot(new IntPoint(7, 4), ResourceCard.WOOD, 3),
+      new MapSlot(new IntPoint(8, 5), ResourceCard.WOOL, 5),
+      new MapSlot(new IntPoint(7, 1), ResourceCard.WOOD, 9),
+      new MapSlot(new IntPoint(8, 2), ResourceCard.BRICK, 10),
+      new MapSlot(new IntPoint(9, 3), ResourceCard.ORE, 8),
     }
   ), // a hexagon made up of 3 layers
 

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import javafx.scene.paint.Color;
-import venusians.data.Point;
+import venusians.data.IntPoint;
 import venusians.data.board.Board;
 import venusians.data.board.buildable.Buildable;
 import venusians.data.board.buildable.City;
@@ -84,20 +84,20 @@ public class Player {
     Chat.add(message);
   }
 
-  public void buildRoad(Point position1, Point position2) {
+  public void buildRoad(IntPoint position1, IntPoint position2) {
     useResources(Road.getBlueprint());
     Road newRoad = new Road(this, position1, position2);
     Board.addBuildable(newRoad);
   }
 
-  public void buildSettlement(Point position) {
+  public void buildSettlement(IntPoint position) {
     throwIfPositionIsntConnectedByRoad(position);
 
     useResources(Settlement.getBlueprint());
     buildStartingSettlement(position);
   }
 
-  private void throwIfPositionIsntConnectedByRoad(Point position) {
+  private void throwIfPositionIsntConnectedByRoad(IntPoint position) {
     boolean hasConnection = false;
     for (Buildable buildable : Board.getBuildables()) {
       if (buildable.getOwner() == this && buildable instanceof Road) {
@@ -118,7 +118,7 @@ public class Player {
     }
   }
 
-  public void buildStartingSettlement(Point position) {
+  public void buildStartingSettlement(IntPoint position) {
     Settlement newSettlement = new Settlement(this, position);
     Board.addBuildable(newSettlement);
   }

@@ -4,12 +4,13 @@ import venusians.data.Point;
 
 public class HexTransform {
 
-  private static double xAngle = Math.cos(Math.PI / 6);
-  private static double yAngle = Math.sin(Math.PI / 6);
+  private static double xAngle = Math.cos(Math.PI / 3);
+  private static double yAngle = Math.sin(Math.PI / 3);
+  private static Point offset = new Point(0, -200);
 
   public static Point toGuiPosition(Point position) {
-    int xPosition = (int) (50 * (position.x - position.y * xAngle));
-    int yPosition = (int) (50 * position.y * yAngle);
+    double xPosition = 50 * (position.x - position.y * xAngle) + offset.x;
+    double yPosition = 50 * position.y * yAngle + offset.y;
     return new Point(xPosition, yPosition);
   }
 }
