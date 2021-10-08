@@ -9,13 +9,15 @@ import venusians.data.Game;
 import venusians.data.Point;
 import venusians.data.board.Board;
 import venusians.data.board.tiles.MapSlot;
-import venusians.data.board.tiles.TileKind;
+import venusians.data.cards.resource.ResourceCard;
 import venusians.gui.HexTransform;
 
 public class MainGameController {
 
-  // @FXML
-  // private AnchorPane mapPane;
+  private double tileOffset = 0.104;
+
+  @FXML
+  private AnchorPane mapPane;
 
   @FXML
   private void gameEnded() throws IOException {
@@ -25,8 +27,6 @@ public class MainGameController {
   @FXML
   private void initialize() {
     Game.startGame();
-
-    // create a map
     for (MapSlot[] row : Board.getMap()) {
       for (MapSlot tile : row) {
         if (tile == null) {
@@ -35,9 +35,11 @@ public class MainGameController {
         Point guiPosition = HexTransform.toGuiPosition(tile.position);
         Image guiImage = tile.kind.getTileImage();
         ImageView imageView = new ImageView(guiImage);
+        imageView.setScaleX(tileOffset);
+        imageView.setScaleY(tileOffset);
         imageView.setLayoutX(guiPosition.x);
         imageView.setLayoutY(guiPosition.y);
-        //mapPane.getChildren().add(imageView);
+        mapPane.getChildren().add(imageView);
       }
     }
   }

@@ -33,7 +33,7 @@ public class Point {
     return new Point(this.x * other.x, this.y * other.y);
   }
 
-  public Point times(int scalar) {
+  public Point times(double scalar) {
     return new Point(this.x * scalar, this.y * scalar);
   }
 

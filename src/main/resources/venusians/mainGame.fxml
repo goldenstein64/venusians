@@ -10,6 +10,7 @@
 	xmlns="http://javafx.com/javafx/8.0.171"
 	xmlns:fx="http://javafx.com/fxml/1"
 	fx:controller="venusians.MainGameController"
+	fx:id="mapPane"
 >
 	<children>
 		<VBox

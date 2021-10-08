@@ -1,14 +1,15 @@
 package venusians.data.cards.resource;
 
+import java.net.URISyntaxException;
 import javafx.scene.image.Image;
 import venusians.data.board.tiles.TileKind;
 
 public enum ResourceCard implements TileKind {
-  WOOD(new Image("file:woodCard.png"), new Image("file:woodTile.png")),
-  WOOL(new Image("file:woolCard.png"), new Image("file:woolTile.png")),
-  WHEAT(new Image("file:wheatCard.png"), new Image("file:wheatTile.png")),
-  ORE(new Image("file:oreCard.png"), new Image("file:oreTile.png")),
-  BRICK(new Image("file:brickCard.png"), new Image("file:brickTile.png"));
+  WOOD("woodCard.png", "woodTile.png"),
+  WOOL("woolCard.png", "woolTile.png"),
+  WHEAT("wheatCard.png", "wheatTile.png"),
+  ORE("oreCard.png", "oreTile.png"),
+  BRICK("brickCard.png", "brickTile.png");
 
   private static final ResourceCard[] resourceArray = new ResourceCard[] {
     WOOD,
@@ -21,9 +22,15 @@ public enum ResourceCard implements TileKind {
   private Image cardImage;
   private Image tileImage;
 
-  private ResourceCard(Image cardImage, Image tileImage) {
-    this.cardImage = cardImage;
-    this.tileImage = tileImage;
+  private ResourceCard(String cardImage, String tileImage) {
+    try {
+      this.cardImage =
+        new Image(getClass().getResource(cardImage).toURI().toString());
+      this.tileImage =
+        new Image(getClass().getResource(tileImage).toURI().toString());
+    } catch (URISyntaxException e) {
+      e.printStackTrace();
+    }
   }
 
   public static ResourceCard valueOf(int value) {
