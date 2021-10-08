@@ -4,11 +4,11 @@ import javafx.scene.image.Image;
 import venusians.data.board.tiles.TileKind;
 
 public enum ResourceCard implements TileKind {
-  WOOD(new Image("woodCard.png"), new Image("woodTile.png")),
-  WOOL(new Image("woolCard.png"), new Image("woolTile.png")),
-  WHEAT(new Image("wheatCard.png"), new Image("wheatTile.png")),
-  ORE(new Image("oreCard.png"), new Image("oreTile.png")),
-  BRICK(new Image("brickCard.png"), new Image("brickTile.png"));
+  WOOD(new Image("file:woodCard.png"), new Image("file:woodTile.png")),
+  WOOL(new Image("file:woolCard.png"), new Image("file:woolTile.png")),
+  WHEAT(new Image("file:wheatCard.png"), new Image("file:wheatTile.png")),
+  ORE(new Image("file:oreCard.png"), new Image("file:oreTile.png")),
+  BRICK(new Image("file:brickCard.png"), new Image("file:brickTile.png"));
 
   private static final ResourceCard[] resourceArray = new ResourceCard[] {
     WOOD,

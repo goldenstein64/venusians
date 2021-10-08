@@ -5,6 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -64,7 +65,12 @@ public class SetupController {
 
     profileList =
       FXCollections.observableArrayList(
-        new PlayerProfile("James", Color.WHITE)
+        new PlayerProfile("James", 0),
+        new PlayerProfile(1),
+        new PlayerProfile(2),
+        new PlayerProfile(3),
+        new PlayerProfile(4),
+        new PlayerProfile(5)
       );
     playerProfileTable.setItems(profileList);
   }
@@ -77,7 +83,12 @@ public class SetupController {
   @FXML
   private void ready() throws IOException {
     GameOptions gameOptions = Game.getGameOptions();
-    gameOptions.profiles = profileList;
+    gameOptions.profiles.clear();
+    for (PlayerProfile profile : profileList) {
+      if (!profile.getName().isEmpty()) {
+        gameOptions.profiles.add(profile);
+      }
+    }
     gameOptions.randomizeTilePositions = randomizeTilePositionsBox.isSelected();
     gameOptions.randomizeRollValues = randomizeRollValuesBox.isSelected();
 

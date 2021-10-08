@@ -21,7 +21,7 @@
 			fx:id="playerProfileTable"
 			editable="true"
 			fixedCellSize="30"
-			prefHeight="210"
+			maxHeight="210"
 		>
 			<columns>
 				<TableColumn
@@ -37,7 +37,7 @@
 			</columns>
 		</TableView>
 		<VBox
-			alignment="BOTTOM_CENTER"
+			alignment="CENTER"
 			spacing="20.0"
 			xmlns="http://javafx.com/javafx/8.0.171"
 			xmlns:fx="http://javafx.com/fxml/1"

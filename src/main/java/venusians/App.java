@@ -17,7 +17,7 @@ public class App extends Application {
 
   @Override
   public void start(Stage stage) throws IOException {
-    scene = new Scene(loadFXML("setup"), 640, 480);
+    scene = new Scene(loadFXML("setup"), 1200, 800);
     stage.setScene(scene);
     stage.setTitle("The Venusians");
     stage.show();
@@ -25,10 +25,6 @@ public class App extends Application {
 
   static void setRoot(String fxml) throws IOException {
     scene.setRoot(loadFXML(fxml));
-  }
-
-  static void startGame() {
-    Game.startGame();
   }
 
   private static Parent loadFXML(String fxml) throws IOException {
