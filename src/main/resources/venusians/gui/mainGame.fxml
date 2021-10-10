@@ -1,30 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane
+<StackPane
 	xmlns="http://javafx.com/javafx/8.0.171"
 	xmlns:fx="http://javafx.com/fxml/1"
 	fx:controller="venusians.gui.main.MainGameController"
-	fx:id="mapPane"
 >
 	<children>
-		<Label
-			text="Victory Points:"
-			alignment="TOP_RIGHT"
+		<AnchorPane
+			fx:id="mapPane"
 		 />
-		<VBox
-			alignment="CENTER"
-			spacing="20.0"
+		<HBox
+			alignment="TOP_RIGHT"
+			spacing="10.0"
 		>
 			<children>
 				<Label
-					text="Main Game"
+					alignment="CENTER"
+					text="Victory Points:"
+				>
+					<font>
+						<Font size="25" />
+					</font>
+				</Label>
+				<Label
+					fx:id="victoryPointsValueLabel"
+					alignment="CENTER"
+					text="0"
+				>
+					<font>
+						<Font size="25" />
+					</font>
+				</Label>
+			</children>
+			<padding>
+				<Insets
+					bottom="20.0"
+					left="20.0"
+					right="20.0"
+					top="20.0"
 				 />
+			</padding>
+		</HBox>
+		<VBox
+			alignment="CENTER_RIGHT"
+			spacing="20.0"
+		>
+			<children>
+				<Button
+					text="Build"
+				 />
+				<Button
+					text="Trade"
+				 />
+				<Button
+					text="Use Development Card"
+				 />
+			</children>
+			<padding>
+				<Insets
+					bottom="20.0"
+					left="20.0"
+					right="20.0"
+					top="20.0"
+				 />
+			</padding>
+		</VBox>
+		<VBox
+			alignment="TOP_CENTER"
+			spacing="20.0"
+		>
+			<children>
 				<Button
 					fx:id="secondaryButton"
 					text="Switch to Results"
@@ -41,4 +95,4 @@
 			</padding>
 		</VBox>
 	</children>
-</AnchorPane>
+</StackPane>

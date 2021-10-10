@@ -3,6 +3,8 @@ package venusians.data.players;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.scene.paint.Color;
 import venusians.data.IntPoint;
 import venusians.data.board.Board;
@@ -23,6 +25,7 @@ public class Player {
   private String name;
   private Color color;
   private int victoryPoints = 0;
+  private ReadOnlyIntegerWrapper victoryPointsWrapper;
 
   public Player(String name, Color color) {
     this.name = name;
@@ -30,6 +33,8 @@ public class Player {
     for (ResourceCard card : ResourceCard.values()) {
       resourceHand.put(card, 0);
     }
+    this.victoryPointsWrapper =
+      new ReadOnlyIntegerWrapper(this, "victoryPoints");
   }
 
   public String getName() {
@@ -50,6 +55,14 @@ public class Player {
 
   public int getVictoryPoints() {
     return victoryPoints;
+  }
+
+  private void setVictoryPoints(int victoryPoints) {
+    this.victoryPoints = victoryPoints;
+  }
+
+  public ReadOnlyIntegerProperty victoryPointsProperty() {
+    return victoryPointsWrapper.getReadOnlyProperty();
   }
 
   public void startTurn() {
@@ -121,6 +134,7 @@ public class Player {
   public void buildStartingSettlement(IntPoint position) {
     Settlement newSettlement = new Settlement(this, position);
     Board.addBuildable(newSettlement);
+    setVictoryPoints(victoryPoints + 1);
   }
 
   public void upgradeSettlement(Settlement settlement) {
@@ -129,6 +143,7 @@ public class Player {
     useResources(City.getBlueprint());
     City newCity = new City(this, settlement.getPosition());
     Board.upgradeBuildable(settlement, newCity);
+    setVictoryPoints(victoryPoints + 1);
   }
 
   private void throwIfSettlementIsntOnBoard(Settlement settlement) {
@@ -187,5 +202,15 @@ public class Player {
 
   private boolean hasResourcesFromEntry(Entry<ResourceCard, Integer> entry) {
     return resourceHand.get(entry.getKey()) < entry.getValue();
+  }
+
+  public void getDevelopmentCard() {
+    // get a random development card
+    setVictoryPoints(victoryPoints + 1);
+  }
+
+  public void useDevelopmentCard(DevelopmentCard card) {
+    card.apply();
+    developmentHand.remove(card);
   }
 }

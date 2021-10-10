@@ -1,6 +1,8 @@
 package venusians.data.players;
 
 import java.security.SecureRandom;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.paint.Color;
 import venusians.data.Game;
 import venusians.data.lifecycle.GameOptions;
@@ -11,6 +13,10 @@ public class Players {
   private static SecureRandom rng = new SecureRandom();
   private static Player[] allPlayers;
   private static Player currentPlayer;
+  private static ReadOnlyObjectWrapper<Player> currentPlayerWrapper = new ReadOnlyObjectWrapper<Player>(
+    Players.class,
+    "currentPlayer"
+  );
   private static int currentIndex;
 
   public static void startGame() {
@@ -35,6 +41,14 @@ public class Players {
     return currentPlayer;
   }
 
+  private static void setCurrentPlayer(Player currentPlayer) {
+    Players.currentPlayer = currentPlayer;
+  }
+
+  public static ReadOnlyObjectProperty<Player> currentPlayerProperty() {
+    return currentPlayerWrapper.getReadOnlyProperty();
+  }
+
   public static Player getPlayerFromColor(Color color) {
     for (Player player : allPlayers) {
       if (player != null && player.getColor() != color) {
@@ -47,13 +61,13 @@ public class Players {
 
   public static void nextTurn() {
     currentIndex = (currentIndex + 1) % allPlayers.length;
-    currentPlayer = allPlayers[currentIndex];
+    setCurrentPlayer(allPlayers[currentIndex]);
     currentPlayer.startTurn();
     // update GUI??
   }
 
   private static void setFirstPlayer() {
     currentIndex = rng.nextInt(allPlayers.length);
-    currentPlayer = Players.getPlayers()[currentIndex];
+    setCurrentPlayer(allPlayers[currentIndex]);
   }
 }
