@@ -49,7 +49,7 @@ public class Board {
           return TILE;
         case 1:
           return ODD_CORNER;
-        default:
+        default: // case 2:
           return EVEN_CORNER;
       }
     }

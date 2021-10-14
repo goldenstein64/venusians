@@ -42,6 +42,7 @@ public class Players {
   }
 
   private static void setCurrentPlayer(Player currentPlayer) {
+    currentPlayerWrapper.set(currentPlayer);
     Players.currentPlayer = currentPlayer;
   }
 

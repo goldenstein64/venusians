@@ -57,7 +57,8 @@ public class Player {
     return victoryPoints;
   }
 
-  private void setVictoryPoints(int victoryPoints) {
+  public void setVictoryPoints(int victoryPoints) {
+    victoryPointsWrapper.set(victoryPoints);
     this.victoryPoints = victoryPoints;
   }
 
