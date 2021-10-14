@@ -1,5 +1,8 @@
 package venusians.data;
 
+/**
+ * A class responsible for representing a 2D integer point in space
+ */
 public class IntPoint extends Point {
 
   public final int x;
@@ -9,10 +12,6 @@ public class IntPoint extends Point {
     super(x, y);
     this.x = x;
     this.y = y;
-  }
-
-  public boolean equals(Point other) {
-    return this.x == other.x && this.y == other.y;
   }
 
   public IntPoint plus(IntPoint other) {

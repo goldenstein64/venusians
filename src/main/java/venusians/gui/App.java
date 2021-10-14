@@ -14,6 +14,7 @@ public class App extends Application {
 
   private static Scene scene;
 
+  /** Describes what happens when the window is first initialized. */
   @Override
   public void start(Stage stage) throws IOException {
     scene = new Scene(loadFXML("setup"));
@@ -22,6 +23,7 @@ public class App extends Application {
     stage.show();
   }
 
+  /** Sets a new scene with the given file name */
   public static void setRoot(String fxml) throws IOException {
     scene.setRoot(loadFXML(fxml));
   }
@@ -33,6 +35,10 @@ public class App extends Application {
     return fxmlLoader.load();
   }
 
+  /**
+   * Provides the main entry point into the program.
+   * @param args Arguments passed into the program's invocation.
+   */
   public static void main(String[] args) {
     launch();
   }

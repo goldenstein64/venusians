@@ -38,6 +38,7 @@ public class Board {
     new IntPoint(0, 1),
   };
 
+  /** Describes what type of formation is found at a certain point */
   public static enum PositionType {
     TILE,
     EVEN_CORNER,
@@ -55,31 +56,25 @@ public class Board {
     }
   }
 
-  public static Event<MapChangedArgs> mapChanged = new Event<MapChangedArgs>();
+  public static Event<Buildable> onBuildableAdded = new Event<Buildable>();
 
-  public static class MapChangedArgs {
+  public static Event<BuildableUpgradedArgs> onBuildableUpgraded = new Event<BuildableUpgradedArgs>();
 
-    public static enum ActionType {
-      ADDED,
-      UPGRADED,
-    }
+  public static class BuildableUpgradedArgs {
 
-    public Buildable from;
-    public Buildable to;
-    public ActionType actionType;
+    public final Buildable from;
+    public final Buildable to;
 
-    public MapChangedArgs(Buildable buildable) {
-      this.to = buildable;
-      this.actionType = ActionType.ADDED;
-    }
-
-    public MapChangedArgs(Buildable from, Buildable to) {
+    public BuildableUpgradedArgs(Buildable from, Buildable to) {
       this.from = from;
       this.to = to;
-      this.actionType = ActionType.UPGRADED;
     }
   }
 
+  /**
+   * Assuming the game's GameOptions has been finalized, it initializes the map
+   * contained in the Board object with the specified map setup.
+   */
   public static void startGame() {
     GameOptions gameOptions = Game.getGameOptions();
 
@@ -92,13 +87,9 @@ public class Board {
 
     map = new MapSlot[13][13];
 
-    if (gameOptions.randomizeTilePositions) {
-      randomizeSlotPositions(slots);
-    }
+    if (gameOptions.areTilePositionsRandomized) randomizeTilePositions(slots);
 
-    if (gameOptions.randomizeRollValues) {
-      randomizeRollValues(slots);
-    }
+    if (gameOptions.areRollValuesRandomized) randomizeRollValues(slots);
 
     setMapToSlots(slots);
   }
@@ -111,7 +102,7 @@ public class Board {
     return newSlots;
   }
 
-  private static void randomizeSlotPositions(MapSlot[] slots) {
+  private static void randomizeTilePositions(MapSlot[] slots) {
     for (int i = 0; i < slots.length; i++) {
       int choice = rng.nextInt(slots.length);
       MapSlot slot1 = slots[i];
@@ -158,13 +149,13 @@ public class Board {
 
   public static void addBuildable(Buildable buildable) {
     allBuildables.add(buildable);
-    mapChanged.fire(new MapChangedArgs(buildable));
+    onBuildableAdded.fire(buildable);
   }
 
   public static void upgradeBuildable(Buildable from, Buildable to) {
     allBuildables.remove(from);
     allBuildables.add(to);
-    mapChanged.fire(new MapChangedArgs(from, to));
+    onBuildableUpgraded.fire(new BuildableUpgradedArgs(from, to));
   }
 
   public static Point getRobberPosition() {

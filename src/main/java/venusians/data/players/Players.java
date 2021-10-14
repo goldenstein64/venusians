@@ -19,6 +19,10 @@ public class Players {
   );
   private static int currentIndex;
 
+  /**
+   * Assuming the game's GameOptions has been finalized, it initializes all
+   * Player objects as well as the current player.
+   */
   public static void startGame() {
     GameOptions gameOptions = Game.getGameOptions();
     allPlayers = new Player[gameOptions.profiles.size()];

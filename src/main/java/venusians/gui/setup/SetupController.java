@@ -89,8 +89,9 @@ public class SetupController {
         gameOptions.profiles.add(profile);
       }
     }
-    gameOptions.randomizeTilePositions = randomizeTilePositionsBox.isSelected();
-    gameOptions.randomizeRollValues = randomizeRollValuesBox.isSelected();
+    gameOptions.areTilePositionsRandomized =
+      randomizeTilePositionsBox.isSelected();
+    gameOptions.areRollValuesRandomized = randomizeRollValuesBox.isSelected();
 
     App.setRoot("mainGame");
   }

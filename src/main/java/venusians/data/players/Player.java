@@ -18,6 +18,10 @@ import venusians.data.cards.resource.ResourceCard;
 import venusians.data.chat.Chat;
 import venusians.data.chat.Message;
 
+/**
+ * Describes the data and possible actions a participant has while playing the
+ * game.
+ */
 public class Player {
 
   private ArrayList<DevelopmentCard> developmentHand = new ArrayList<DevelopmentCard>();

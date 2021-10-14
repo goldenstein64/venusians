@@ -3,7 +3,7 @@ package venusians.data.lifecycle;
 import javafx.scene.paint.Color;
 
 /**
- * Contains data pertaining to how to set up each player from setup
+ * Contains data pertaining to how to set up each player for the next game.
  */
 public class PlayerProfile {
 
