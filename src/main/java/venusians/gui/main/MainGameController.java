@@ -3,11 +3,17 @@ package venusians.gui.main;
 import java.io.IOException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import venusians.data.Game;
 import venusians.data.Point;
 import venusians.data.board.Board;
@@ -18,7 +24,10 @@ import venusians.gui.App;
 
 public class MainGameController {
 
-  private double tileOffset = 0.104;
+  private final double tileOffset = 0.104;
+  private final int HISTORY_RANGE = 20;
+
+  private boolean shouldResetVvalue = false;
 
   @FXML
   private AnchorPane mapPane;
@@ -27,16 +36,51 @@ public class MainGameController {
   private Label victoryPointsValueLabel;
 
   @FXML
-  private void endGame() throws IOException {
+  private TextField chatPrompt;
+
+  @FXML
+  private VBox chatHistory;
+
+  @FXML
+  private ScrollPane chatScrollPane;
+
+  @FXML
+  private void endGame(ActionEvent event) throws IOException {
     App.setRoot("results");
   }
 
-  private ChangeListener<Number> victoryPointListener = new ChangeListener<Number>() {
+  @FXML
+  private void incrementVictoryPoints() {
+    Player currentPlayer = Players.getCurrentPlayer();
+    int oldValue = currentPlayer.getVictoryPoints();
+    currentPlayer.setVictoryPoints(oldValue + 1);
+  }
+
+  @FXML
+  private void sayMessage() {
+    String message = chatPrompt.getText();
+    if (message.isEmpty()) return;
+
+    String authorName = Players.getCurrentPlayer().getName();
+    String messageContent = String.format("[%s]: %s", authorName, message);
+
+    ObservableList<Node> chatChildren = chatHistory.getChildren();
+
+    Label messageLabel = new Label(messageContent);
+    chatChildren.add(messageLabel);
+    if (chatChildren.size() > HISTORY_RANGE) chatChildren.remove(0);
+
+    chatPrompt.setText("");
+    shouldResetVvalue = true;
+  }
+
+  private ChangeListener<Number> victoryPointsListener = new ChangeListener<Number>() {
     public void changed(
       ObservableValue<? extends Number> value,
       Number oldValue,
       Number newValue
     ) {
+      System.out.println("fired!");
       victoryPointsValueLabel.setText(newValue.toString());
     }
   };
@@ -49,10 +93,24 @@ public class MainGameController {
     ) {
       if (oldValue != null) oldValue
         .victoryPointsProperty()
-        .removeListener(victoryPointListener);
+        .removeListener(victoryPointsListener);
       if (newValue != null) newValue
         .victoryPointsProperty()
-        .addListener(victoryPointListener);
+        .addListener(victoryPointsListener);
+    }
+  };
+
+  private ChangeListener<Number> setToMax = new ChangeListener<Number>() {
+    public void changed(
+      ObservableValue<? extends Number> value,
+      Number oldValue,
+      Number newValue
+    ) {
+      double oldDouble = (double) oldValue;
+      if (shouldResetVvalue && oldDouble == 1.0) {
+        chatScrollPane.setVvalue(1);
+      }
+      shouldResetVvalue = false;
     }
   };
 
@@ -62,7 +120,17 @@ public class MainGameController {
 
     createMap();
 
+    initializePlayers();
+
+    chatScrollPane.vvalueProperty().addListener(setToMax);
+  }
+
+  private void initializePlayers() {
     Players.currentPlayerProperty().addListener(playerListener);
+    Player currentPlayer = Players.getCurrentPlayer();
+    currentPlayer.victoryPointsProperty().addListener(victoryPointsListener);
+    int currentVictoryPoints = currentPlayer.getVictoryPoints();
+    victoryPointsValueLabel.setText(String.valueOf(currentVictoryPoints));
   }
 
   private void createMap() {
