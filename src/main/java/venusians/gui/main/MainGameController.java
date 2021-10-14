@@ -27,7 +27,7 @@ public class MainGameController {
   private final double tileOffset = 0.104;
   private final int HISTORY_RANGE = 20;
 
-  private boolean shouldResetVvalue = false;
+  private boolean shouldSnapVvalue = false;
 
   @FXML
   private AnchorPane mapPane;
@@ -71,7 +71,9 @@ public class MainGameController {
     if (chatChildren.size() > HISTORY_RANGE) chatChildren.remove(0);
 
     chatPrompt.setText("");
-    shouldResetVvalue = true;
+    if (chatScrollPane.getVvalue() == 1.0) {
+      shouldSnapVvalue = true;
+    }
   }
 
   private ChangeListener<Number> victoryPointsListener = new ChangeListener<Number>() {
@@ -106,11 +108,10 @@ public class MainGameController {
       Number oldValue,
       Number newValue
     ) {
-      double oldDouble = (double) oldValue;
-      if (shouldResetVvalue && oldDouble == 1.0) {
+      if (shouldSnapVvalue) {
+        shouldSnapVvalue = false;
         chatScrollPane.setVvalue(1);
       }
-      shouldResetVvalue = false;
     }
   };
 
@@ -127,8 +128,10 @@ public class MainGameController {
 
   private void initializePlayers() {
     Players.currentPlayerProperty().addListener(playerListener);
+
     Player currentPlayer = Players.getCurrentPlayer();
     currentPlayer.victoryPointsProperty().addListener(victoryPointsListener);
+
     int currentVictoryPoints = currentPlayer.getVictoryPoints();
     victoryPointsValueLabel.setText(String.valueOf(currentVictoryPoints));
   }
