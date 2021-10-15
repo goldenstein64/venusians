@@ -13,11 +13,11 @@ public class Players {
   private static SecureRandom rng = new SecureRandom();
   private static Player[] allPlayers;
   private static Player currentPlayer;
+  private static int currentIndex;
   private static ReadOnlyObjectWrapper<Player> currentPlayerWrapper = new ReadOnlyObjectWrapper<Player>(
     Players.class,
     "currentPlayer"
   );
-  private static int currentIndex;
 
   /**
    * Assuming the game's GameOptions has been finalized, it initializes all
@@ -25,16 +25,22 @@ public class Players {
    */
   public static void startGame() {
     GameOptions gameOptions = Game.getGameOptions();
+
+    createPlayers(gameOptions);
+
+    setFirstPlayer();
+  }
+
+  private static void createPlayers(GameOptions gameOptions) {
     allPlayers = new Player[gameOptions.profiles.size()];
     for (int i = 0; i < allPlayers.length; i++) {
       PlayerProfile profile = gameOptions.profiles.get(i);
       allPlayers[i] = new Player(profile.name, profile.color);
     }
-    setFirstPlayer();
   }
 
   public static Player[] getPlayers() {
-    return (Player[]) allPlayers;
+    return allPlayers;
   }
 
   public static int getPlayerCount() {
@@ -54,9 +60,14 @@ public class Players {
     return currentPlayerWrapper.getReadOnlyProperty();
   }
 
+  /**
+   * Looks through each player and returns the one with the given color.
+   * @param color The Player color to look for
+   * @return The Player with that color.
+   */
   public static Player getPlayerFromColor(Color color) {
     for (Player player : allPlayers) {
-      if (player != null && player.getColor() != color) {
+      if (player != null && player.getColor().equals(color)) {
         return player;
       }
     }
@@ -64,6 +75,7 @@ public class Players {
     throw new RuntimeException("Player not found");
   }
 
+  /** Advances to the next player's turn, setting the new current player. */
   public static void nextTurn() {
     currentIndex = (currentIndex + 1) % allPlayers.length;
     setCurrentPlayer(allPlayers[currentIndex]);
@@ -71,6 +83,7 @@ public class Players {
     // update GUI??
   }
 
+  /** Randomly selects which player goes first. */
   private static void setFirstPlayer() {
     currentIndex = rng.nextInt(allPlayers.length);
     setCurrentPlayer(allPlayers[currentIndex]);

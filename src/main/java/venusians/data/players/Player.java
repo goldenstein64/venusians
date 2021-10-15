@@ -153,7 +153,7 @@ public class Player {
 
   private void throwIfSettlementIsntOnBoard(Settlement settlement) {
     if (!Board.hasBuildable(settlement)) {
-      throw new RuntimeException("Settlement is not on the board");
+      throw new IllegalArgumentException("This settlement is not on the board");
     }
   }
 
@@ -192,7 +192,9 @@ public class Player {
     HashMap<ResourceCard, Integer> resources
   ) {
     if (!hasResources(resources)) {
-      throw new RuntimeException("Cannot build this blueprint");
+      throw new RuntimeException(
+        "This Buildable does not have sufficient resources."
+      );
     }
   }
 
