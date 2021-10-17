@@ -2,7 +2,8 @@
   "[java]": {
     "editor.defaultFormatter": "mwpb.java-prettier-formatter",
     "editor.tabSize": 2,
-    "editor.insertSpaces": true
+    "editor.insertSpaces": false
   },
-  "xml.format.preserveAttributeLineBreaks": true
+  "xml.format.preserveAttributeLineBreaks": true,
+  "java.format.settings.url": "eclipse-formatter.xml"
 }
