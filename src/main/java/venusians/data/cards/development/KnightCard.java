@@ -1,22 +1,23 @@
 package venusians.data.cards.development;
 
+import java.net.URISyntaxException;
 import java.util.Random;
 import javafx.scene.image.Image;
 import venusians.data.players.Player;
 
 public class KnightCard extends DevelopmentCard {
 
-  private Random rng = new Random();
-  private static final String name = "";
-  private static final String description = "";
-  private final Image cardImage;
+  private static final String name = "Knight";
+  private static final String description = "Move the Robber.";
+  private static final Image cardImage = loadImage("knightChip.png");
   private Player owner;
 
   public KnightCard(Player owner) {
     this.owner = owner;
-    int chosenImage = rng.nextInt(5) + 1;
-    String chosenImagePath = String.format("/knight%d.png", chosenImage);
-    cardImage = new Image(chosenImagePath);
+  }
+
+  public Image getCardImage() {
+    return cardImage;
   }
 
   public void apply() {

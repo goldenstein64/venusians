@@ -7,7 +7,7 @@ public class RoadBuildingCard extends DevelopmentCard {
 
   private static final String name = "";
   private static final String description = "";
-  private static final Image cardImage = new Image("");
+  private static final Image cardImage = loadImage("roadBuildingChip.png");
   private Player owner;
 
   public RoadBuildingCard(Player owner) {

@@ -6,16 +6,13 @@ import venusians.data.players.Player;
 
 public class VictoryPointCard extends DevelopmentCard {
 
-  private Random rng = new Random();
-  private final String name;
+  private static final String name = "Victory Point";
   private static final String description = "";
-  private final Image cardImage;
+  private static final Image cardImage = loadImage("victoryPointChip.png");
   private Player owner;
 
   public VictoryPointCard(Player owner) {
     this.owner = owner;
-    this.name = "Library";
-    this.cardImage = new Image("");
   }
 
   public void apply() {
