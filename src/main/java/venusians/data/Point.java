@@ -37,6 +37,14 @@ public class Point {
     return new Point(this.x * scalar, this.y * scalar);
   }
 
+  public Point over(Point other) {
+    return new Point(this.x / other.x, this.y / other.y);
+  }
+
+  public Point over(double scalar) {
+    return new Point(this.x / scalar, this.y / scalar);
+  }
+
   public IntPoint asInt() {
     return new IntPoint((int) x, (int) y);
   }
