@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="venusians.gui.main.MainGameController">
+<StackPane fx:id="mainViewPane" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="venusians.gui.main.MainGameController">
 	<children>
 		<AnchorPane fx:id="mapPane" />
 		<BorderPane fx:id="buttonPane">
@@ -23,7 +23,6 @@
 					<children>
 						<Button text="Build" />
 						<Button text="Trade" />
-						<Button text="Use Development Card" />
 						<Button onAction="#incrementVictoryPoints" text="Increment Victory Points" />
 					</children>
 				</VBox>
@@ -75,6 +74,15 @@
                </children>
             </HBox>
          </top>
+         <bottom>
+            <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <StackPane prefHeight="150.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="diceRollButton" mnemonicParsing="false" onAction="#rollDice" text="Roll Dice" />
+                  <StackPane prefHeight="150.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+         </bottom>
 		</BorderPane>
 	</children>
 </StackPane>
