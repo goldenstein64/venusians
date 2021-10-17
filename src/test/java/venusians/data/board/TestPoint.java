@@ -1,4 +1,4 @@
-package venusians.data;
+package venusians.data.board;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -90,5 +90,27 @@ class TestPoint {
 
     assertEquals(result.x, 240);
     assertEquals(result.y, 1560);
+  }
+
+  @Test
+  void dividePointByScalar() {
+    Point some = new Point(20, 30);
+    int scalar = 10;
+
+    Point result = some.over(scalar);
+
+    assertEquals(result.x, 2);
+    assertEquals(result.y, 3);
+  }
+
+  @Test
+  void dividePointByPoint() {
+    Point some = new Point(20, 30);
+    Point other = new Point(5, 6);
+
+    Point result = some.over(other);
+
+    assertEquals(result.x, 4);
+    assertEquals(result.y, 5);
   }
 }

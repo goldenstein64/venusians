@@ -3,8 +3,6 @@ package venusians.data.board;
 import java.security.SecureRandom;
 import java.util.HashSet;
 import venusians.data.Game;
-import venusians.data.IntPoint;
-import venusians.data.Point;
 import venusians.data.board.buildable.Buildable;
 import venusians.data.board.tiles.MapPreset;
 import venusians.data.board.tiles.MapSlot;

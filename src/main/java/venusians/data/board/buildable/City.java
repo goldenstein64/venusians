@@ -2,7 +2,8 @@ package venusians.data.board.buildable;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
-import venusians.data.IntPoint;
+
+import venusians.data.board.IntPoint;
 import venusians.data.cards.resource.ResourceCard;
 import venusians.data.players.Player;
 

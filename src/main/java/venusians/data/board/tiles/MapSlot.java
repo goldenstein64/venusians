@@ -1,6 +1,6 @@
 package venusians.data.board.tiles;
 
-import venusians.data.IntPoint;
+import venusians.data.board.IntPoint;
 
 public class MapSlot {
 

@@ -1,6 +1,6 @@
 package venusians.data.board.tiles;
 
-import venusians.data.IntPoint;
+import venusians.data.board.IntPoint;
 import venusians.data.cards.resource.ResourceCard;
 
 public enum MapPreset {

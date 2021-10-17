@@ -1,7 +1,7 @@
 package venusians.gui.main;
 
-import venusians.data.IntPoint;
-import venusians.data.Point;
+import venusians.data.board.IntPoint;
+import venusians.data.board.Point;
 
 public class HexTransform {
 

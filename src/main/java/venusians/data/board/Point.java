@@ -1,4 +1,4 @@
-package venusians.data;
+package venusians.data.board;
 
 /**
  * A class responsible for representing a point in 2D space.

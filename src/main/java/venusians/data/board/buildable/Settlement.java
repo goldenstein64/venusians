@@ -2,8 +2,8 @@ package venusians.data.board.buildable;
 
 import java.util.HashMap;
 import javafx.scene.image.Image;
-import venusians.data.IntPoint;
 import venusians.data.board.Board;
+import venusians.data.board.IntPoint;
 import venusians.data.board.Board.PositionType;
 import venusians.data.board.tiles.MapSlot;
 import venusians.data.cards.resource.ResourceCard;

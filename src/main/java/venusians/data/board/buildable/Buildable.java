@@ -2,7 +2,7 @@ package venusians.data.board.buildable;
 
 import java.util.HashMap;
 import javafx.scene.image.Image;
-import venusians.data.Point;
+import venusians.data.board.Point;
 import venusians.data.cards.resource.ResourceCard;
 import venusians.data.players.Player;
 
