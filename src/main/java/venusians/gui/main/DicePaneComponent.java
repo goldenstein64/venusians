@@ -15,7 +15,7 @@ import javafx.scene.shape.Rectangle;
 import venusians.data.DiceRoll;
 
 public class DicePaneComponent {
-	public static void showDice(Pane mainViewPane) {
+	public static void showDiceWindow(Pane mainViewPane) {
 		// roll the dice first
     DiceRoll diceRoll = new DiceRoll(2);
 

@@ -14,6 +14,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -22,6 +23,8 @@ import venusians.data.Game;
 import venusians.data.board.Board;
 import venusians.data.board.Point;
 import venusians.data.board.tiles.MapSlot;
+import venusians.data.cards.development.DevelopmentCard;
+import venusians.data.cards.resource.ResourceCard;
 import venusians.data.players.Player;
 import venusians.data.players.Players;
 import venusians.gui.App;
@@ -46,6 +49,12 @@ public class MainGameController {
 
   @FXML
   private VBox chatHistory;
+
+  @FXML
+  private Pane developmentPane;
+
+  @FXML
+  private Pane resourcePane;
 
   @FXML
   private StackPane mainViewPane;
@@ -90,7 +99,7 @@ public class MainGameController {
 
   @FXML
   private void rollDice() {
-    DicePaneComponent.showDice(mainViewPane);
+    DicePaneComponent.showDiceWindow(mainViewPane);
   }
 
   @FXML
@@ -98,10 +107,17 @@ public class MainGameController {
     Game.startGame();
 
     createMap();
-
     initializePlayers();
-
     applyChatSnap();
+
+    Player currentPlayer = Players.getCurrentPlayer();
+
+    for (int i = 0; i < 5; i++) {
+      currentPlayer.pickDevelopmentCard();
+    }
+
+    displayCards(currentPlayer.getDevelopmentHand());
+    displayCards(currentPlayer.getResourceHand());
   }
 
   private void createMap() {
@@ -180,5 +196,33 @@ public class MainGameController {
           chatScrollPane.setVvalue(1);
         }
       }
-    );
+      );
+    
+  private void displayCards(DevelopmentCard[] cards) {
+    for (int i = 0; i < cards.length; i++) {
+      DevelopmentCard card = cards[i];
+      Image cardImage = card.getCardImage();
+      ImageView cardImageView = new ImageView(cardImage);
+      cardImageView.setFitWidth(100);
+      cardImageView.setFitHeight(100);
+      double offset = 20 * (i - (cards.length - 1) / 2.0);
+      cardImageView.layoutXProperty().bind(developmentPane.widthProperty().divide(2.0).add(offset));
+      cardImageView.setLayoutY(37.5);
+      developmentPane.getChildren().add(cardImageView);
+    }
+  }
+
+  private void displayCards(ResourceCard[] cards) {
+    for (int i = 0; i < cards.length; i++) {
+      ResourceCard card = cards[i];
+      Image cardImage = card.getCardImage();
+      ImageView cardImageView = new ImageView(cardImage);
+      cardImageView.setFitWidth(100);
+      cardImageView.setFitHeight(100);
+      double offset = 20 * (i - (cards.length - 1) / 2.0);
+      cardImageView.layoutXProperty().bind(resourcePane.widthProperty().divide(2.0).add(offset));
+      cardImageView.setLayoutY(37.5);
+      resourcePane.getChildren().add(cardImageView);
+    }
+  }
 }
