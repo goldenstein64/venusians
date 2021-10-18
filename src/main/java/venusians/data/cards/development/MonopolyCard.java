@@ -15,6 +15,22 @@ public class MonopolyCard extends DevelopmentCard {
     this.owner = owner;
   }
 
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public String getDescription() {
+    return description;
+  }
+
+  @Override
+  public Image getCardImage() {
+    return cardImage;
+  }
+
+  @Override
   public void apply() {
     // Declare a resource
     // every other player must give 2 of that resource

@@ -14,6 +14,22 @@ public class YearOfPlentyCard extends DevelopmentCard {
     this.owner = owner;
   }
 
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public String getDescription() {
+    return description;
+  }
+
+  @Override
+  public Image getCardImage() {
+    return cardImage;
+  }
+
+  @Override
   public void apply() {
     // take 2 of any resource.
     // it can be 2 of the same or 2 different resources

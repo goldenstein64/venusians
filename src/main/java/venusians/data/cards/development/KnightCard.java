@@ -16,10 +16,22 @@ public class KnightCard extends DevelopmentCard {
     this.owner = owner;
   }
 
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public String getDescription() {
+    return description;
+  }
+
+  @Override
   public Image getCardImage() {
     return cardImage;
   }
 
+  @Override
   public void apply() {
     // choose a place to move the robber.
     // if the robber lands next to a settlement, choose one and steal a resource from its owner.

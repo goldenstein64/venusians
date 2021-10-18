@@ -5,18 +5,12 @@ import javafx.scene.image.Image;
 
 public abstract class DevelopmentCard {
 
-  private static final String name = null;
-  private static final String description = null;
-  private static final Image cardImage = null;
-
-  public abstract void apply();
-
   protected static Image loadImage(String filename) {
     Image tempCardImage = null;
     try {
       tempCardImage =
         new Image(
-          MonopolyCard.class.getResource("monopolyChip.png").toURI().toString()
+          DevelopmentCard.class.getResource(filename).toURI().toString()
         );
     } catch (URISyntaxException e) {
       e.printStackTrace();
@@ -24,15 +18,11 @@ public abstract class DevelopmentCard {
     return tempCardImage;
   }
 
-  public String getName() {
-    return name;
-  }
+  public abstract String getName();
 
-  public String getDescription() {
-    return description;
-  }
+  public abstract String getDescription();
 
-  public Image getCardImage() {
-    return cardImage;
-  }
+  public abstract Image getCardImage();
+
+  public abstract void apply();
 }

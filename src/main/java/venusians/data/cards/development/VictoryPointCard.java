@@ -15,7 +15,23 @@ public class VictoryPointCard extends DevelopmentCard {
     this.owner = owner;
   }
 
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public String getDescription() {
+    return description;
+  }
+
+  @Override
+  public Image getCardImage() {
+    return cardImage;
+  }
+
+  @Override
   public void apply() {
-    // add a victory point to the player's total score
+    owner.incrementVictoryPoints();
   }
 }
