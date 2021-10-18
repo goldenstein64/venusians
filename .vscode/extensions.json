@@ -1,7 +1,6 @@
 {
   "recommendations": [
     "vscjava.vscode-java-pack",
-    "redhat.vscode-xml",
-    "mwpb.java-prettier-formatter"
+    "redhat.vscode-xml"
   ]
 }
