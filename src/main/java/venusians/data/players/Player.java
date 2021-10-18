@@ -49,12 +49,21 @@ public class Player {
     return color;
   }
 
-  public ArrayList<DevelopmentCard> getDevelopmentHand() {
-    return developmentHand;
+  public DevelopmentCard[] getDevelopmentHand() {
+    return (DevelopmentCard[]) developmentHand.toArray();
   }
 
-  public HashMap<ResourceCard, Integer> getResourceHand() {
-    return resourceHand;
+  public ResourceCard[] getResourceHand() {
+    ArrayList<ResourceCard> result = new ArrayList<ResourceCard>();
+    for (Entry<ResourceCard, Integer> pair : resourceHand.entrySet()) {
+      ResourceCard card = pair.getKey();
+      int count = pair.getValue();
+      for (int i = 0; i < count; i++) {
+        result.add(card);
+      }
+    }
+
+    return (ResourceCard[]) result.toArray();
   }
 
   public int getVictoryPoints() {
@@ -62,8 +71,13 @@ public class Player {
   }
 
   public void setVictoryPoints(int victoryPoints) {
-    victoryPointsWrapper.set(victoryPoints);
     this.victoryPoints = victoryPoints;
+    victoryPointsWrapper.set(victoryPoints);
+  }
+
+  public void incrementVictoryPoints() {
+    victoryPoints += 1;
+    victoryPointsWrapper.set(victoryPoints);
   }
 
   public ReadOnlyIntegerProperty victoryPointsProperty() {
@@ -211,13 +225,14 @@ public class Player {
     return resourceHand.get(entry.getKey()) < entry.getValue();
   }
 
-  public void getDevelopmentCard() {
-    // get a random development card
-    setVictoryPoints(victoryPoints + 1);
+  public void pickDevelopmentCard() {
+    DevelopmentCard card = DevelopmentCard.pickRandomCard(this);
+    developmentHand.add(card);
   }
 
   public void useDevelopmentCard(DevelopmentCard card) {
     card.apply();
     developmentHand.remove(card);
+    // place the used card in the dead pool
   }
 }
