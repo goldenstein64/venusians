@@ -3,8 +3,9 @@ package venusians.data.cards.resource;
 import java.net.URISyntaxException;
 import javafx.scene.image.Image;
 import venusians.data.board.tiles.TileKind;
+import venusians.data.cards.HasCardImage;
 
-public enum ResourceCard implements TileKind {
+public enum ResourceCard implements TileKind, HasCardImage {
   WOOD("woodCard.png", "woodTile.png"),
   WOOL("woolCard.png", "woolTile.png"),
   WHEAT("wheatCard.png", "wheatTile.png"),

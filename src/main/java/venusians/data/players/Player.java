@@ -14,7 +14,9 @@ import venusians.data.board.buildable.Road;
 import venusians.data.board.buildable.Settlement;
 import venusians.data.cards.TradeRequest;
 import venusians.data.cards.development.DevelopmentCard;
+import venusians.data.cards.development.DevelopmentCardList;
 import venusians.data.cards.resource.ResourceCard;
+import venusians.data.cards.resource.ResourceCardList;
 import venusians.data.chat.Chat;
 import venusians.data.chat.Message;
 
@@ -24,7 +26,7 @@ import venusians.data.chat.Message;
  */
 public class Player {
 
-  private ArrayList<DevelopmentCard> developmentHand = new ArrayList<DevelopmentCard>();
+  private DevelopmentCardList developmentHand = new DevelopmentCardList();
   private HashMap<ResourceCard, Integer> resourceHand = new HashMap<ResourceCard, Integer>();
   private String name;
   private Color color;
@@ -49,12 +51,12 @@ public class Player {
     return color;
   }
 
-  public DevelopmentCard[] getDevelopmentHand() {
-    return (DevelopmentCard[]) developmentHand.toArray();
+  public DevelopmentCardList getDevelopmentHand() {
+    return developmentHand;
   }
 
-  public ResourceCard[] getResourceHand() {
-    ArrayList<ResourceCard> result = new ArrayList<ResourceCard>();
+  public ResourceCardList getResourceHand() {
+    ResourceCardList result = new ResourceCardList();
     for (Entry<ResourceCard, Integer> pair : resourceHand.entrySet()) {
       ResourceCard card = pair.getKey();
       int count = pair.getValue();
@@ -63,7 +65,7 @@ public class Player {
       }
     }
 
-    return (ResourceCard[]) result.toArray();
+    return result;
   }
 
   public int getVictoryPoints() {
@@ -226,13 +228,13 @@ public class Player {
   }
 
   public void pickDevelopmentCard() {
-    DevelopmentCard card = DevelopmentCard.pickRandomCard(this);
+    DevelopmentCard card = DevelopmentCard.pickCard(this);
     developmentHand.add(card);
   }
 
   public void useDevelopmentCard(DevelopmentCard card) {
     card.apply();
     developmentHand.remove(card);
-    // place the used card in the dead pool
+    DevelopmentCard.returnCard(card);
   }
 }

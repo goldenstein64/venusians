@@ -1,6 +1,8 @@
 package venusians.gui.main;
 
 import java.io.IOException;
+import java.util.ArrayList;
+
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -23,8 +25,11 @@ import venusians.data.Game;
 import venusians.data.board.Board;
 import venusians.data.board.Point;
 import venusians.data.board.tiles.MapSlot;
+import venusians.data.cards.HasCardImage;
 import venusians.data.cards.development.DevelopmentCard;
+import venusians.data.cards.development.DevelopmentCardList;
 import venusians.data.cards.resource.ResourceCard;
+import venusians.data.cards.resource.ResourceCardList;
 import venusians.data.players.Player;
 import venusians.data.players.Players;
 import venusians.gui.App;
@@ -117,6 +122,7 @@ public class MainGameController {
     }
 
     displayCards(currentPlayer.getDevelopmentHand());
+
     displayCards(currentPlayer.getResourceHand());
   }
 
@@ -198,31 +204,26 @@ public class MainGameController {
       }
       );
     
-  private void displayCards(DevelopmentCard[] cards) {
-    for (int i = 0; i < cards.length; i++) {
-      DevelopmentCard card = cards[i];
-      Image cardImage = card.getCardImage();
-      ImageView cardImageView = new ImageView(cardImage);
-      cardImageView.setFitWidth(100);
-      cardImageView.setFitHeight(100);
-      double offset = 20 * (i - (cards.length - 1) / 2.0);
-      cardImageView.layoutXProperty().bind(developmentPane.widthProperty().divide(2.0).add(offset));
-      cardImageView.setLayoutY(37.5);
-      developmentPane.getChildren().add(cardImageView);
-    }
+
+  private void displayCards(ResourceCardList cards) {
+    displayCardsOnPane(cards, resourcePane);
   }
 
-  private void displayCards(ResourceCard[] cards) {
-    for (int i = 0; i < cards.length; i++) {
-      ResourceCard card = cards[i];
+  private void displayCards(DevelopmentCardList cards) {
+    displayCardsOnPane(cards, developmentPane);
+  }
+
+  private <T extends HasCardImage> void displayCardsOnPane(ArrayList<T> cards, Pane cardPane) {
+    for (int i = 0; i < cards.size(); i++) {
+      T card = cards.get(i);
       Image cardImage = card.getCardImage();
       ImageView cardImageView = new ImageView(cardImage);
       cardImageView.setFitWidth(100);
       cardImageView.setFitHeight(100);
-      double offset = 20 * (i - (cards.length - 1) / 2.0);
-      cardImageView.layoutXProperty().bind(resourcePane.widthProperty().divide(2.0).add(offset));
+      double offset = 20 * (i - (cards.size() - 1) / 2.0);
+      cardImageView.layoutXProperty().bind(cardPane.widthProperty().divide(2.0).add(offset));
       cardImageView.setLayoutY(37.5);
-      resourcePane.getChildren().add(cardImageView);
+      cardPane.getChildren().add(cardImageView);
     }
   }
 }
