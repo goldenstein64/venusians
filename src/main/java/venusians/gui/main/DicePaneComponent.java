@@ -15,8 +15,8 @@ import javafx.scene.shape.Rectangle;
 import venusians.data.DiceRoll;
 
 public class DicePaneComponent {
-	public static void showDiceWindow(Pane mainViewPane) {
-		// roll the dice first
+  public static void rollDice(Pane parentPane, ExitCallback exitCallback) {
+    // roll the dice first
     DiceRoll diceRoll = new DiceRoll(2);
 
     // add a rolling dice label
@@ -25,14 +25,14 @@ public class DicePaneComponent {
     Rectangle backdrop = new Rectangle();
     backdrop.setFill(Color.BLACK);
     backdrop.setOpacity(0.75);
-    backdrop.widthProperty().bind(mainViewPane.widthProperty());
-    backdrop.heightProperty().bind(mainViewPane.heightProperty());
+    backdrop.widthProperty().bind(parentPane.widthProperty());
+    backdrop.heightProperty().bind(parentPane.heightProperty());
 
     Rectangle windowGraphic = new Rectangle(300, 200);
     windowGraphic.setArcWidth(20);
     windowGraphic.setArcHeight(20);
     windowGraphic.setFill(Color.GREY);
-    
+
     VBox contentBox = new VBox();
     contentBox.setAlignment(Pos.CENTER);
 
@@ -58,13 +58,18 @@ public class DicePaneComponent {
     Button okButton = new Button("OK");
 
     okButton.setOnAction(event -> {
-      mainViewPane.getChildren().remove(dicePane);
+      parentPane.getChildren().remove(dicePane);
+      exitCallback.execute(diceRoll.totalValue);
     });
 
     contentBox.getChildren().addAll(totalValueLabel, diceBox, okButton);
 
     dicePane.getChildren().addAll(backdrop, windowGraphic, contentBox);
 
-    mainViewPane.getChildren().add(dicePane);
-	}
+    parentPane.getChildren().add(dicePane);
+  }
+
+  public interface ExitCallback {
+    public void execute(int rollValue);
+  }
 }

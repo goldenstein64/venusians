@@ -53,7 +53,7 @@
                      </content>
                   </TitledPane>
                   <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                  <Button fx:id="secondaryButton" alignment="CENTER" onAction="#endGame" text="Switch to Results" />
+                  <Button fx:id="secondaryButton" alignment="CENTER" onAction="#endGame" text="End Turn" />
                   <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
             		<HBox alignment="TOP_CENTER" spacing="10.0">
             			<children>
@@ -79,7 +79,12 @@
             <HBox alignment="CENTER">
                <children>
                   <Pane fx:id="developmentPane" prefHeight="100.0" prefWidth="50.0" HBox.hgrow="ALWAYS" />
-                  <Button fx:id="diceRollButton" minWidth="75.0" mnemonicParsing="false" onAction="#rollDice" text="Roll Dice" />
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0">
+                     <children>
+                        <Button fx:id="diceRollButton" minWidth="75.0" mnemonicParsing="false" onAction="#rollDice" text="Roll Dice" />
+                        <Label fx:id="rollResultLabel" />
+                     </children>
+                  </VBox>
                   <Pane fx:id="resourcePane" prefHeight="50.0" prefWidth="50.0" HBox.hgrow="ALWAYS" />
                </children>
                <padding>

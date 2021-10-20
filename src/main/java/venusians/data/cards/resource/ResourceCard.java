@@ -1,44 +1,46 @@
 package venusians.data.cards.resource;
 
-import java.net.URISyntaxException;
 import javafx.scene.image.Image;
+import venusians.data.board.tiles.PortKind;
 import venusians.data.board.tiles.TileKind;
-import venusians.data.cards.HasCardImage;
+import venusians.data.cards.HasCard;
+import venusians.util.Images;
 
-public enum ResourceCard implements TileKind, HasCardImage {
-  WOOD("woodCard.png", "woodTile.png"),
-  WOOL("woolCard.png", "woolTile.png"),
-  WHEAT("wheatCard.png", "wheatTile.png"),
-  ORE("oreCard.png", "oreTile.png"),
-  BRICK("brickCard.png", "brickTile.png");
-
-  private static final ResourceCard[] resourceArray = new ResourceCard[] {
-    WOOD,
-    WOOL,
-    WHEAT,
-    ORE,
-    BRICK,
-  };
+public enum ResourceCard implements TileKind, PortKind, HasCard {
+  WOOD("woodCard.png", "woodTile.png", "woodPort.png"),
+  WOOL("woolCard.png", "woolTile.png", "woolPort.png"),
+  WHEAT("wheatCard.png", "wheatTile.png", "wheatPort.png"),
+  ORE("oreCard.png", "oreTile.png", "orePort.png"),
+  BRICK("brickCard.png", "brickTile.png", "brickPort.png");
 
   private Image cardImage;
   private Image tileImage;
+  private Image portImage;
 
-  private ResourceCard(String cardImage, String tileImage) {
-    try {
-      this.cardImage =
-        new Image(getClass().getResource(cardImage).toURI().toString());
-      this.tileImage =
-        new Image(getClass().getResource(tileImage).toURI().toString());
-    } catch (URISyntaxException e) {
-      e.printStackTrace();
-    }
+  private int portNecessaryCount = 2;
+  private int portRequestedCount = 1;
+
+  private ResourceCard(String cardImage, String tileImage, String portImage) {
+    this.cardImage = Images.load(this, cardImage);
+    this.tileImage = Images.load(this, tileImage);
+    this.portImage = Images.load(this, portImage);
   }
 
   public static ResourceCard valueOf(int value) {
-    if (value >= resourceArray.length) {
-      throw new IllegalArgumentException("Value too large");
+    switch (value) {
+      case 0:
+        return WOOD;
+      case 1:
+        return WOOL;
+      case 2:
+        return WHEAT;
+      case 3:
+        return ORE;
+      case 4:
+        return BRICK;
+      default:
+        throw new IllegalArgumentException(String.format("Value (%d) is invalid", value));
     }
-    return resourceArray[value];
   }
 
   public Image getCardImage() {
@@ -47,5 +49,17 @@ public enum ResourceCard implements TileKind, HasCardImage {
 
   public Image getTileImage() {
     return tileImage;
+  }
+
+  public Image getPortImage() {
+    return portImage;
+  }
+
+  public int getPortNecessaryCount() {
+    return portNecessaryCount;
+  }
+
+  public int getPortRequestedCount() {
+    return portRequestedCount;
   }
 }

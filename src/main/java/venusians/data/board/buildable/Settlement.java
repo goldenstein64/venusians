@@ -1,18 +1,19 @@
 package venusians.data.board.buildable;
 
-import java.util.HashMap;
 import javafx.scene.image.Image;
 import venusians.data.board.Board;
 import venusians.data.board.IntPoint;
 import venusians.data.board.Board.PositionType;
 import venusians.data.board.tiles.MapSlot;
+import venusians.data.board.tiles.TileSlot;
 import venusians.data.cards.resource.ResourceCard;
+import venusians.data.cards.resource.ResourceCardMap;
 import venusians.data.players.Player;
 
-public class Settlement implements Buildable {
+public class Settlement implements Building {
 
   private static final Image image = new Image("");
-  public static final HashMap<ResourceCard, Integer> blueprint = new HashMap<ResourceCard, Integer>();
+  public static final ResourceCardMap blueprint = new ResourceCardMap();
 
   {
     blueprint.put(ResourceCard.BRICK, 1);
@@ -39,7 +40,7 @@ public class Settlement implements Buildable {
     return position;
   }
 
-  public static HashMap<ResourceCard, Integer> getBlueprint() {
+  public static ResourceCardMap getBlueprint() {
     return blueprint;
   }
 
@@ -52,9 +53,9 @@ public class Settlement implements Buildable {
   public Player getOwner() {
     return owner;
   }
-
-  public HashMap<ResourceCard, Integer> getResources() {
-    HashMap<ResourceCard, Integer> result = new HashMap<ResourceCard, Integer>();
+  
+  public ResourceCardMap getResources() {
+    ResourceCardMap result = new ResourceCardMap();
     MapSlot[][] map = Board.getMap();
     for (
       int i = positionType == PositionType.EVEN_CORNER ? 0 : 1;
@@ -63,13 +64,17 @@ public class Settlement implements Buildable {
     ) {
       IntPoint offset = Board.firstOrderOffsets[i];
       IntPoint newPosition = position.plus(offset);
-      MapSlot tile = map[newPosition.x][newPosition.y];
-      if (tile.kind instanceof ResourceCard) {
+      MapSlot mapSlot = map[newPosition.x][newPosition.y];
+      if (!(mapSlot instanceof TileSlot))
+        continue;
+      TileSlot tile = (TileSlot) mapSlot;
+      if (tile.kind instanceof ResourceCard && tile.rollValue != -1) {
         ResourceCard resource = (ResourceCard) tile.kind;
         int oldValue = result.getOrDefault(resource, 0);
         result.put(resource, oldValue);
       }
     }
+    
     return result;
   }
 }

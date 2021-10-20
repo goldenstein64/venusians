@@ -27,7 +27,7 @@ public class Players {
     GameOptions gameOptions = Game.getGameOptions();
 
     createPlayers(gameOptions);
-
+    shufflePlayers();
     setFirstPlayer();
   }
 
@@ -36,6 +36,16 @@ public class Players {
     for (int i = 0; i < allPlayers.length; i++) {
       PlayerProfile profile = gameOptions.profiles.get(i);
       allPlayers[i] = new Player(profile.name, profile.color);
+    }
+  }
+  
+  private static void shufflePlayers() {
+    for (int i = 0; i < allPlayers.length; i++) {
+      int choice = rng.nextInt(allPlayers.length);
+
+      Player temp = allPlayers[i];
+      allPlayers[i] = allPlayers[choice];
+      allPlayers[choice] = temp;
     }
   }
 
@@ -79,8 +89,6 @@ public class Players {
   public static void nextTurn() {
     currentIndex = (currentIndex + 1) % allPlayers.length;
     setCurrentPlayer(allPlayers[currentIndex]);
-    currentPlayer.startTurn();
-    // update GUI??
   }
 
   /** Randomly selects which player goes first. */

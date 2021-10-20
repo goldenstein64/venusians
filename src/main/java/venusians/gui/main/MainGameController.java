@@ -24,9 +24,11 @@ import javafx.scene.shape.Circle;
 import venusians.data.Game;
 import venusians.data.board.Board;
 import venusians.data.board.Point;
+import venusians.data.board.buildable.Building;
 import venusians.data.board.tiles.MapSlot;
-import venusians.data.cards.HasCardImage;
-import venusians.data.cards.development.DevelopmentCard;
+import venusians.data.board.tiles.PortSlot;
+import venusians.data.board.tiles.TileSlot;
+import venusians.data.cards.HasCard;
 import venusians.data.cards.development.DevelopmentCardList;
 import venusians.data.cards.resource.ResourceCard;
 import venusians.data.cards.resource.ResourceCardList;
@@ -34,14 +36,18 @@ import venusians.data.players.Player;
 import venusians.data.players.Players;
 import venusians.gui.App;
 import venusians.gui.ChangeListenerBuilder;
+import venusians.util.Images;
 
 public class MainGameController {
 
-  private double tileHeightAspectRatio = Math.sqrt(3) / 2;
+  private double TILE_ASPECT_RATIO = Math.sqrt(3) / 2;
 
   private final int HISTORY_RANGE = 20;
+  private final double TILE_SIZE = 100;
 
   private boolean shouldSnapVvalue = false;
+
+  private Image portConnector = Images.load(MainGameController.class, "portConnector.png");
 
   @FXML
   private AnchorPane mapPane;
@@ -69,6 +75,9 @@ public class MainGameController {
 
   @FXML
   private Button diceRollButton;
+
+  @FXML
+  private Label rollResultLabel;
 
   @FXML
   private void endGame(ActionEvent event) throws IOException {
@@ -104,11 +113,31 @@ public class MainGameController {
 
   @FXML
   private void rollDice() {
-    DicePaneComponent.showDiceWindow(mainViewPane);
+    DicePaneComponent.rollDice(mainViewPane, this::onDicePaneExited);
+  }
+  
+  public void onDicePaneExited(int rollValue) {
+    // display number
+    rollResultLabel.setText(String.valueOf(rollValue));
+
+    TileSlot[] tileSlots = Board.getTileSlotsForRollValue(rollValue);
+
+    for (TileSlot slot : tileSlots) {
+      if (!(slot.kind instanceof ResourceCard))
+        continue;
+
+      ResourceCard resourceCard = (ResourceCard) slot.kind;
+
+      for (Building building : Board.getBuildingsForTileSlot(slot)) {
+        building.getOwner().receiveResource(resourceCard);
+      }
+    }
   }
 
   @FXML
   private void initialize() {
+
+
     Game.startGame();
 
     createMap();
@@ -121,6 +150,10 @@ public class MainGameController {
       currentPlayer.pickDevelopmentCard();
     }
 
+    // let the player build some settlements
+    currentPlayer.receiveResource(ResourceCard.BRICK);
+    currentPlayer.receiveResource(ResourceCard.WOOD);
+
     displayCards(currentPlayer.getDevelopmentHand());
 
     displayCards(currentPlayer.getResourceHand());
@@ -128,35 +161,82 @@ public class MainGameController {
 
   private void createMap() {
     for (MapSlot[] row : Board.getMap()) {
-      for (MapSlot tile : row) {
-        if (tile == null) continue;
+      for (MapSlot mapSlot : row) {
+        if (mapSlot == null)
+          continue;
 
-        Point guiPosition = HexTransform.toGuiPosition(tile.position);
-        Image guiImage = tile.kind.getTileImage();
+        Point guiPosition = HexTransform.toGuiPosition(mapSlot.position);
 
-        StackPane slotPane = new StackPane();
+        StackPane slotPane;
+        if (mapSlot instanceof TileSlot) {
+          slotPane = generateTile((TileSlot) mapSlot);
+        } else if (mapSlot instanceof PortSlot) {
+          slotPane = generatePort((PortSlot) mapSlot);
+        } else {
+          throw new RuntimeException("MapSlot kind not found");
+        }
+
         slotPane.setLayoutX(guiPosition.x);
         slotPane.setLayoutY(guiPosition.y);
         slotPane.setAlignment(Pos.CENTER);
-
-        ImageView imageView = new ImageView(guiImage);
-        imageView.setFitWidth(100);
-        imageView.setFitHeight(100 * tileHeightAspectRatio);
-
-        slotPane.getChildren().add(imageView);
-
-        if (tile.rollValue != -1) {
-          Circle rollValueShape = new Circle(15);
-          rollValueShape.setFill(Color.WHITE);
-
-          Label rollValueLabel = new Label(String.valueOf(tile.rollValue));
-
-          slotPane.getChildren().addAll(rollValueShape, rollValueLabel);
-        }
-
+        
         mapPane.getChildren().add(slotPane);
       }
     }
+  }
+
+  private StackPane generateTile(TileSlot tile) {
+    StackPane result = new StackPane();
+
+    Image tileImage = tile.kind.getTileImage();
+    ImageView imageView = new ImageView(tileImage);
+    imageView.setFitWidth(TILE_SIZE);
+    imageView.setFitHeight(TILE_SIZE * TILE_ASPECT_RATIO);
+
+    result.getChildren().add(imageView);
+
+    if (tile.rollValue != -1) {
+      Circle rollValueShape = new Circle(15);
+      rollValueShape.setFill(Color.WHITE);
+
+      Label rollValueLabel = new Label(String.valueOf(tile.rollValue));
+
+      result.getChildren().addAll(rollValueShape, rollValueLabel);
+    }
+
+    return result;
+  }
+
+  private StackPane generatePort(PortSlot port) {
+    StackPane result = new StackPane();
+    result.setPrefWidth(TILE_SIZE);
+    result.setPrefHeight(TILE_SIZE * TILE_ASPECT_RATIO);
+
+    StackPane connectorPane = new StackPane();
+    connectorPane.setPrefWidth(TILE_SIZE);
+    connectorPane.setPrefHeight(TILE_SIZE * TILE_ASPECT_RATIO);
+
+    Image portImage = port.kind.getPortImage();
+    ImageView portImageView = new ImageView(portImage);
+    portImageView.setFitWidth(TILE_SIZE * 0.6);
+    portImageView.setFitHeight(TILE_SIZE * 0.6);
+
+    ImageView portConnectorImageView = new ImageView(portConnector);
+    portConnectorImageView.setFitWidth(TILE_SIZE);
+    portConnectorImageView.setFitHeight(TILE_SIZE * TILE_ASPECT_RATIO);
+    Label tradeRatioLabel = new Label(String.format(
+      "%d:%d", 
+      port.kind.getPortNecessaryCount(), 
+      port.kind.getPortRequestedCount()
+    ));
+
+    connectorPane.setRotate(60 * port.portDirection);
+
+    connectorPane.getChildren().addAll(portConnectorImageView, tradeRatioLabel);
+
+    result.getChildren().addAll(connectorPane, portImageView);
+
+    return result;
   }
 
   private void initializePlayers() {
@@ -213,14 +293,14 @@ public class MainGameController {
     displayCardsOnPane(cards, developmentPane);
   }
 
-  private <T extends HasCardImage> void displayCardsOnPane(ArrayList<T> cards, Pane cardPane) {
+  private <T extends HasCard> void displayCardsOnPane(ArrayList<T> cards, Pane cardPane) {
     for (int i = 0; i < cards.size(); i++) {
       T card = cards.get(i);
       Image cardImage = card.getCardImage();
       ImageView cardImageView = new ImageView(cardImage);
       cardImageView.setFitWidth(100);
       cardImageView.setFitHeight(100);
-      double offset = 20 * (i - (cards.size() - 1) / 2.0);
+      double offset = 80 * (i - (cards.size() - 1) / 2.0) - 50;
       cardImageView.layoutXProperty().bind(cardPane.widthProperty().divide(2.0).add(offset));
       cardImageView.setLayoutY(37.5);
       cardPane.getChildren().add(cardImageView);

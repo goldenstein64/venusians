@@ -1,17 +1,16 @@
 package venusians.data.board.buildable;
 
-import java.util.HashMap;
 import javafx.scene.image.Image;
-import venusians.data.board.Point;
-import venusians.data.cards.resource.ResourceCard;
+import venusians.data.board.IntPoint;
+import venusians.data.cards.resource.ResourceCardMap;
 import venusians.data.players.Player;
 
 public interface Buildable {
-  public static HashMap<ResourceCard, Integer> getBlueprint() {
+  public static ResourceCardMap getBlueprint() {
     return null;
   }
 
-  public Point getPosition();
+  public IntPoint getPosition();
 
   public Image getImage();
 

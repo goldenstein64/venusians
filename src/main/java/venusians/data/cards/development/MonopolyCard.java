@@ -1,18 +1,17 @@
 package venusians.data.cards.development;
 
-import java.net.URISyntaxException;
 import javafx.scene.image.Image;
 import venusians.data.players.Player;
+import venusians.util.Images;
 
 public class MonopolyCard extends DevelopmentCard {
 
   private static final String name = "";
   private static final String description = "";
-  private static final Image cardImage = loadImage("monopolyChip.png");
-  private Player owner;
+  private static final Image cardImage = Images.load(MonopolyCard.class, "monopolyChip.png");
 
   public MonopolyCard(Player owner) {
-    this.owner = owner;
+    super(owner);
   }
 
   @Override

@@ -1,19 +1,17 @@
 package venusians.data.cards.development;
 
-import java.net.URISyntaxException;
-import java.util.Random;
 import javafx.scene.image.Image;
 import venusians.data.players.Player;
+import venusians.util.Images;
 
 public class KnightCard extends DevelopmentCard {
 
   private static final String name = "Knight";
   private static final String description = "Move the Robber.";
-  private static final Image cardImage = loadImage("knightChip.png");
-  private Player owner;
+  private static final Image cardImage = Images.load(KnightCard.class, "knightChip.png");
 
   public KnightCard(Player owner) {
-    this.owner = owner;
+    super(owner);
   }
 
   @Override

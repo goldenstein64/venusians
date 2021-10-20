@@ -1,15 +1,15 @@
 package venusians.data.board.buildable;
 
-import java.util.HashMap;
 import javafx.scene.image.Image;
 import venusians.data.board.IntPoint;
 import venusians.data.cards.resource.ResourceCard;
+import venusians.data.cards.resource.ResourceCardMap;
 import venusians.data.players.Player;
 
 public class Road implements Buildable {
 
   private static final Image image = new Image("");
-  private static final HashMap<ResourceCard, Integer> blueprint = new HashMap<ResourceCard, Integer>();
+  private static final ResourceCardMap blueprint = new ResourceCardMap();
 
   {
     blueprint.put(ResourceCard.WOOD, 1);
@@ -26,7 +26,7 @@ public class Road implements Buildable {
     this.position2 = position2;
   }
 
-  public static HashMap<ResourceCard, Integer> getBlueprint() {
+  public static ResourceCardMap getBlueprint() {
     return blueprint;
   }
 

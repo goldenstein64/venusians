@@ -1,10 +1,9 @@
 package venusians.data.cards;
 
-import java.util.HashMap;
-import venusians.data.cards.resource.ResourceCard;
+import venusians.data.cards.resource.ResourceCardMap;
 
 public class TradeRequest {
 
-  public HashMap<ResourceCard, Integer> requestedResources;
-  public HashMap<ResourceCard, Integer> necessaryResources;
+  public ResourceCardMap requestedResources;
+  public ResourceCardMap necessaryResources;
 }

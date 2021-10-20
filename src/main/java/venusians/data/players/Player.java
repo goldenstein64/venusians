@@ -1,7 +1,5 @@
 package venusians.data.players;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map.Entry;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.ReadOnlyIntegerWrapper;
@@ -17,6 +15,7 @@ import venusians.data.cards.development.DevelopmentCard;
 import venusians.data.cards.development.DevelopmentCardList;
 import venusians.data.cards.resource.ResourceCard;
 import venusians.data.cards.resource.ResourceCardList;
+import venusians.data.cards.resource.ResourceCardMap;
 import venusians.data.chat.Chat;
 import venusians.data.chat.Message;
 
@@ -27,20 +26,19 @@ import venusians.data.chat.Message;
 public class Player {
 
   private DevelopmentCardList developmentHand = new DevelopmentCardList();
-  private HashMap<ResourceCard, Integer> resourceHand = new HashMap<ResourceCard, Integer>();
   private String name;
   private Color color;
+  private int roadPool = 15;
+  private int settlementPool = 5;
+  private int cityPool = 4;
+  private PlayerResources resources = new PlayerResources();
   private int victoryPoints = 0;
   private ReadOnlyIntegerWrapper victoryPointsWrapper;
 
   public Player(String name, Color color) {
     this.name = name;
     this.color = color;
-    for (ResourceCard card : ResourceCard.values()) {
-      resourceHand.put(card, 0);
-    }
-    this.victoryPointsWrapper =
-      new ReadOnlyIntegerWrapper(this, "victoryPoints");
+    this.victoryPointsWrapper = new ReadOnlyIntegerWrapper();
   }
 
   public String getName() {
@@ -55,17 +53,12 @@ public class Player {
     return developmentHand;
   }
 
-  public ResourceCardList getResourceHand() {
-    ResourceCardList result = new ResourceCardList();
-    for (Entry<ResourceCard, Integer> pair : resourceHand.entrySet()) {
-      ResourceCard card = pair.getKey();
-      int count = pair.getValue();
-      for (int i = 0; i < count; i++) {
-        result.add(card);
-      }
-    }
+  public void receiveResource(ResourceCard resourceCard) {
+    resources.addResources(resourceCard, 1);
+  }
 
-    return result;
+  public ResourceCardList getResourceHand() {
+    return this.resources.getResourceHand();
   }
 
   public int getVictoryPoints() {
@@ -84,14 +77,6 @@ public class Player {
 
   public ReadOnlyIntegerProperty victoryPointsProperty() {
     return victoryPointsWrapper.getReadOnlyProperty();
-  }
-
-  public void startTurn() {
-    // roll dice
-
-    // put gui in active state (for this player)
-
-    // the gui should be the part that calls endTurn()
   }
 
   public void endTurn() {
@@ -119,7 +104,12 @@ public class Player {
   }
 
   public void buildRoad(IntPoint position1, IntPoint position2) {
-    useResources(Road.getBlueprint());
+    if (roadPool <= 0) {
+      throw new RuntimeException("Road pool is empty");
+    }
+    roadPool -= 1;
+
+    this.resources.removeResources(Road.getBlueprint());
     Road newRoad = new Road(this, position1, position2);
     Board.addBuildable(newRoad);
   }
@@ -127,7 +117,12 @@ public class Player {
   public void buildSettlement(IntPoint position) {
     throwIfPositionIsntConnectedByRoad(position);
 
-    useResources(Settlement.getBlueprint());
+    if (settlementPool <= 0) {
+      throw new RuntimeException("Settlment pool is empty");
+    }
+    settlementPool -= 1;
+
+    this.resources.removeResources(Settlement.getBlueprint());
     buildStartingSettlement(position);
   }
 
@@ -146,9 +141,7 @@ public class Player {
       }
     }
     if (!hasConnection) {
-      throw new IllegalArgumentException(
-        "This position is not connected by a road."
-      );
+      throw new IllegalArgumentException("This position is not connected by a road.");
     }
   }
 
@@ -160,8 +153,13 @@ public class Player {
 
   public void upgradeSettlement(Settlement settlement) {
     throwIfSettlementIsntOnBoard(settlement);
+    if (cityPool <= 0) {
+      throw new RuntimeException("City pool is empty");
+    }
+    cityPool -= 1;
+    settlementPool += 1;
 
-    useResources(City.getBlueprint());
+    this.resources.removeResources(City.getBlueprint());
     City newCity = new City(this, settlement.getPosition());
     Board.upgradeBuildable(settlement, newCity);
     setVictoryPoints(victoryPoints + 1);
@@ -175,56 +173,19 @@ public class Player {
 
   private void transferResources(
     Player to,
-    HashMap<ResourceCard, Integer> resources
+    ResourceCardMap request
   ) {
-    for (Entry<ResourceCard, Integer> entry : resources.entrySet()) {
-      ResourceCard key = entry.getKey();
+    for (Entry<ResourceCard, Integer> entry : request.entrySet()) {
+      ResourceCard card = entry.getKey();
       int value = entry.getValue();
 
-      int oldOwnerValue = resourceHand.get(key);
-      resourceHand.put(key, oldOwnerValue - value);
-
-      int oldOtherValue = to.resourceHand.get(key);
-      to.resourceHand.put(key, oldOtherValue + value);
+      this.resources.removeResources(card, value);
+      to.resources.addResources(card, value);
     }
   }
 
-  private void useResources(HashMap<ResourceCard, Integer> resources) {
-    throwIfCantUseResources(resources);
-    removeResourcesFromHand(resources);
-  }
-
-  private void removeResourcesFromHand(
-    HashMap<ResourceCard, Integer> resources
-  ) {
-    for (Entry<ResourceCard, Integer> entry : resources.entrySet()) {
-      ResourceCard key = entry.getKey();
-      int oldValue = resourceHand.get(key);
-      resourceHand.put(key, oldValue - entry.getValue());
-    }
-  }
-
-  private void throwIfCantUseResources(
-    HashMap<ResourceCard, Integer> resources
-  ) {
-    if (!hasResources(resources)) {
-      throw new RuntimeException(
-        "This Buildable does not have sufficient resources."
-      );
-    }
-  }
-
-  public boolean hasResources(HashMap<ResourceCard, Integer> resources) {
-    for (Entry<ResourceCard, Integer> entry : resources.entrySet()) {
-      if (hasResourcesFromEntry(entry)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private boolean hasResourcesFromEntry(Entry<ResourceCard, Integer> entry) {
-    return resourceHand.get(entry.getKey()) < entry.getValue();
+  public boolean hasResources(ResourceCardMap request) {
+    return this.resources.hasResources(request);
   }
 
   public void pickDevelopmentCard() {

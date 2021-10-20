@@ -1,14 +1,13 @@
 package venusians.data.cards.development;
 
-import java.net.URISyntaxException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 
 import javafx.scene.image.Image;
-import venusians.data.cards.HasCardImage;
+import venusians.data.cards.HasCard;
 import venusians.data.players.Player;
 
-public abstract class DevelopmentCard implements HasCardImage {
+public abstract class DevelopmentCard implements HasCard {
 
   private static SecureRandom rng = new SecureRandom();
 
@@ -49,7 +48,6 @@ public abstract class DevelopmentCard implements HasCardImage {
     }
   }
   
-  // TODO: find a better way to define the card pool other than their classes?
   private static ArrayList<CardEnum> livePool = new ArrayList<CardEnum>();
   static {
     // fill the cardPool
@@ -76,6 +74,12 @@ public abstract class DevelopmentCard implements HasCardImage {
 
   private static ArrayList<CardEnum> deadPool = new ArrayList<CardEnum>();
 
+  protected Player owner;
+
+  public DevelopmentCard(Player owner) {
+    this.owner = owner;
+  }
+
   public static DevelopmentCard pickCard(Player owner) {
     if (livePool.size() == 0) {
       reshuffleDeadPile();
@@ -91,22 +95,15 @@ public abstract class DevelopmentCard implements HasCardImage {
     deadPool.add(cardEnum);
   }
 
+  public static void returnCards(DevelopmentCard... cards) {
+    for (DevelopmentCard card : cards) {
+      returnCard(card);
+    }
+  }
+
   private static void reshuffleDeadPile() {
     livePool.addAll(deadPool);
     deadPool.clear();
-  }
-
-  protected static Image loadImage(String filename) {
-    Image tempCardImage = null;
-    try {
-      tempCardImage =
-        new Image(
-          DevelopmentCard.class.getResource(filename).toURI().toString()
-        );
-    } catch (URISyntaxException e) {
-      e.printStackTrace();
-    }
-    return tempCardImage;
   }
 
   public abstract String getName();

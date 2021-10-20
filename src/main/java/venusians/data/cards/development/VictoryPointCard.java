@@ -1,18 +1,17 @@
 package venusians.data.cards.development;
 
-import java.util.Random;
 import javafx.scene.image.Image;
 import venusians.data.players.Player;
+import venusians.util.Images;
 
 public class VictoryPointCard extends DevelopmentCard {
 
   private static final String name = "Victory Point";
   private static final String description = "";
-  private static final Image cardImage = loadImage("victoryPointChip.png");
-  private Player owner;
+  private static final Image cardImage = Images.load(VictoryPointCard.class, "victoryPointChip.png");
 
   public VictoryPointCard(Player owner) {
-    this.owner = owner;
+    super(owner);
   }
 
   @Override

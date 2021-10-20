@@ -2,16 +2,16 @@ package venusians.data.cards.development;
 
 import javafx.scene.image.Image;
 import venusians.data.players.Player;
+import venusians.util.Images;
 
 public class YearOfPlentyCard extends DevelopmentCard {
 
   private static final String name = "";
   private static final String description = "";
-  private static final Image cardImage = loadImage("yearOfPlentyChip.png");
-  private Player owner;
+  private static final Image cardImage = Images.load(YearOfPlentyCard.class, "yearOfPlentyChip.png");
 
   public YearOfPlentyCard(Player owner) {
-    this.owner = owner;
+    super(owner);
   }
 
   @Override

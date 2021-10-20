@@ -1,19 +1,28 @@
 package venusians.data.board;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import venusians.data.Game;
 import venusians.data.board.buildable.Buildable;
+import venusians.data.board.buildable.Building;
+import venusians.data.board.buildable.Road;
 import venusians.data.board.tiles.MapPreset;
 import venusians.data.board.tiles.MapSlot;
+import venusians.data.board.tiles.PortSlot;
+import venusians.data.board.tiles.TileSlot;
 import venusians.data.lifecycle.GameOptions;
 import venusians.util.Event;
 
 public class Board {
 
   private static SecureRandom rng = new SecureRandom();
-  private static MapSlot[][] map;
+  private static MapSlot[][] slotMap;
+  private static HashMap<Integer, ArrayList<TileSlot>> rollValueMap;
   private static HashSet<Buildable> allBuildables = new HashSet<Buildable>();
+  private static Building[][] buildingMap;
+  private static ArrayList<Road>[][] roadMap;
   private static Point robberPosition;
 
   /** Lists all offsets that are 2 units away */
@@ -76,35 +85,57 @@ public class Board {
   public static void startGame() {
     GameOptions gameOptions = Game.getGameOptions();
 
-    setUpMap(gameOptions);
+    setUpMaps(gameOptions);
   }
 
-  private static void setUpMap(GameOptions gameOptions) {
+  @SuppressWarnings("unchecked")
+  private static void setUpMaps(GameOptions gameOptions) {
     MapPreset mapPreset = MapPreset.CLASSIC;
-    MapSlot[] slots = deepCloneSlots(mapPreset.getSlots());
+    TileSlot[] tileSlots = deepCloneSlots(mapPreset.getTileSlots());
+    PortSlot[] portSlots = deepCloneSlots(mapPreset.getPortSlots());
 
-    map = new MapSlot[13][13];
+    slotMap = new MapSlot[mapPreset.length][mapPreset.width];
+    buildingMap = new Building[mapPreset.length][mapPreset.width];
+    roadMap = (ArrayList<Road>[][]) new ArrayList[mapPreset.length][mapPreset.width];
+    rollValueMap = new HashMap<>();
 
-    if (gameOptions.areTilePositionsRandomized) randomizeTilePositions(slots);
+    if (gameOptions.areTilePositionsRandomized)
+      randomizeTilePositions(tileSlots);
 
-    if (gameOptions.areRollValuesRandomized) randomizeRollValues(slots);
+    if (gameOptions.areRollValuesRandomized)
+      randomizeRollValues(tileSlots);
 
-    setMapToSlots(slots);
+    putSlots(tileSlots);
+    putSlots(portSlots);
+
+    for (TileSlot tile : tileSlots) {
+      if (tile.rollValue == -1)
+        continue;
+
+      ArrayList<TileSlot> tileArray = rollValueMap.get(tile.rollValue);
+      if (tileArray == null) {
+        tileArray = new ArrayList<>();
+        rollValueMap.put(tile.rollValue, tileArray);
+      }
+
+      tileArray.add(tile);
+    }
   }
 
-  private static MapSlot[] deepCloneSlots(MapSlot[] slots) {
-    MapSlot[] newSlots = slots.clone();
+  @SuppressWarnings("unchecked")
+  private static <T extends MapSlot> T[] deepCloneSlots(T[] slots) {
+    T[] newSlots = slots.clone();
     for (int i = 0; i < newSlots.length; i++) {
-      slots[i] = slots[i].clone();
+      newSlots[i] = (T) slots[i].clone();
     }
     return newSlots;
   }
 
-  private static void randomizeTilePositions(MapSlot[] slots) {
+  private static void randomizeTilePositions(TileSlot[] slots) {
     for (int i = 0; i < slots.length; i++) {
       int choice = rng.nextInt(slots.length);
-      MapSlot slot1 = slots[i];
-      MapSlot slot2 = slots[choice];
+      TileSlot slot1 = slots[i];
+      TileSlot slot2 = slots[choice];
 
       // swap the position on each slot
       IntPoint tempPosition = slot1.position;
@@ -113,11 +144,11 @@ public class Board {
     }
   }
 
-  private static void randomizeRollValues(MapSlot[] slots) {
+  private static void randomizeRollValues(TileSlot[] slots) {
     for (int i = 0; i < slots.length; i++) {
       int choice = rng.nextInt(slots.length);
-      MapSlot slot1 = slots[i];
-      MapSlot slot2 = slots[choice];
+      TileSlot slot1 = slots[i];
+      TileSlot slot2 = slots[choice];
 
       if (slot1.rollValue != -1 && slot2.rollValue != -1) {
         int tempRollValue = slot1.rollValue;
@@ -127,14 +158,15 @@ public class Board {
     }
   }
 
-  private static void setMapToSlots(MapSlot[] slots) {
+  private static void putSlots(MapSlot[] slots) {
     for (MapSlot slot : slots) {
-      map[slot.position.x][slot.position.y] = slot;
+      slotMap[slot.position.x][slot.position.y] = slot;
+      
     }
   }
 
   public static MapSlot[][] getMap() {
-    return map;
+    return slotMap;
   }
 
   public static HashSet<Buildable> getBuildables() {
@@ -147,6 +179,24 @@ public class Board {
 
   public static void addBuildable(Buildable buildable) {
     allBuildables.add(buildable);
+    if (buildable instanceof Road) {
+      Road road = (Road) buildable;
+
+      IntPoint position1 = road.getPosition1();
+      IntPoint position2 = road.getPosition2();
+
+      ArrayList<Road> roadList1 = roadMap[position1.x][position1.y];
+      ArrayList<Road> roadList2 = roadMap[position2.x][position2.y];
+
+      roadList1.add(road);
+      roadList2.add(road);
+    } else if (buildable instanceof Building) {
+      Building building = (Building) buildable;
+
+      IntPoint position = building.getPosition();
+
+      buildingMap[position.x][position.y] = building;
+    }
     onBuildableAdded.fire(buildable);
   }
 
@@ -158,5 +208,28 @@ public class Board {
 
   public static Point getRobberPosition() {
     return robberPosition;
+  }
+
+  public static TileSlot[] getTileSlotsForRollValue(int rollValue) {
+    ArrayList<TileSlot> tileList = rollValueMap.get(rollValue);
+    TileSlot[] result = new TileSlot[tileList.size()];
+    tileList.toArray(result);
+    return result;
+  }
+
+  public static Building[] getBuildingsForTileSlot(TileSlot slot) {
+    IntPoint tilePosition = slot.position;
+    ArrayList<Building> buildingList = new ArrayList<Building>();
+    for (IntPoint offset : firstOrderOffsets) {
+      IntPoint buildingPosition = tilePosition.plus(offset);
+      Building building = buildingMap[buildingPosition.x][buildingPosition.y];
+      if (building != null) {
+        buildingList.add(building);
+      }
+    }
+
+    Building[] result = new Building[buildingList.size()];
+    buildingList.toArray(result);
+    return result;
   }
 }
