@@ -21,6 +21,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
 import venusians.data.Game;
 import venusians.data.board.Board;
 import venusians.data.board.Point;
@@ -47,7 +48,7 @@ public class MainGameController {
 
   private boolean shouldSnapVvalue = false;
 
-  private Image portConnector = Images.load(MainGameController.class, "portConnector.png");
+  private Image portConnectorImage = Images.load(MainGameController.class, "portConnector.png");
 
   @FXML
   private AnchorPane mapPane;
@@ -188,55 +189,79 @@ public class MainGameController {
   private StackPane generateTile(TileSlot tile) {
     StackPane result = new StackPane();
 
-    Image tileImage = tile.kind.getTileImage();
-    ImageView imageView = new ImageView(tileImage);
-    imageView.setFitWidth(TILE_SIZE);
-    imageView.setFitHeight(TILE_SIZE * TILE_ASPECT_RATIO);
-
-    result.getChildren().add(imageView);
+    attachTileImageView(tile, result);
 
     if (tile.rollValue != -1) {
-      Circle rollValueShape = new Circle(15);
-      rollValueShape.setFill(Color.WHITE);
-
-      Label rollValueLabel = new Label(String.valueOf(tile.rollValue));
-
-      result.getChildren().addAll(rollValueShape, rollValueLabel);
+      attachRollValueLabel(tile, result);
     }
 
     return result;
   }
 
+  private void attachTileImageView(TileSlot tile, Pane parentPane) {
+    Image tileImage = tile.kind.getTileImage();
+    ImageView tileImageView = new ImageView(tileImage);
+    fitImageViewToTile(tileImageView);
+    parentPane.getChildren().add(tileImageView);
+  }
+
+  private void attachRollValueLabel(TileSlot tile, Pane parentPane) {
+    Circle rollValueShape = new Circle(15);
+    rollValueShape.setFill(Color.WHITE);
+
+    Label rollValueLabel = new Label(String.valueOf(tile.rollValue));
+
+    parentPane.getChildren().addAll(rollValueShape, rollValueLabel);
+  }
+  
+  private void fitImageViewToTile(ImageView imageView) {
+    imageView.setFitWidth(TILE_SIZE);
+    imageView.setFitHeight(TILE_SIZE * TILE_ASPECT_RATIO);
+  }
+
   private StackPane generatePort(PortSlot port) {
     StackPane result = new StackPane();
-    result.setPrefWidth(TILE_SIZE);
-    result.setPrefHeight(TILE_SIZE * TILE_ASPECT_RATIO);
+    fitPaneToTile(result);
 
-    StackPane connectorPane = new StackPane();
-    connectorPane.setPrefWidth(TILE_SIZE);
-    connectorPane.setPrefHeight(TILE_SIZE * TILE_ASPECT_RATIO);
-
-    Image portImage = port.kind.getPortImage();
-    ImageView portImageView = new ImageView(portImage);
-    portImageView.setFitWidth(TILE_SIZE * 0.6);
-    portImageView.setFitHeight(TILE_SIZE * 0.6);
-
-    ImageView portConnectorImageView = new ImageView(portConnector);
-    portConnectorImageView.setFitWidth(TILE_SIZE);
-    portConnectorImageView.setFitHeight(TILE_SIZE * TILE_ASPECT_RATIO);
-    Label tradeRatioLabel = new Label(String.format(
-      "%d:%d", 
-      port.kind.getPortNecessaryCount(), 
-      port.kind.getPortRequestedCount()
-    ));
-
-    connectorPane.setRotate(60 * port.portDirection);
-
-    connectorPane.getChildren().addAll(portConnectorImageView, tradeRatioLabel);
-
-    result.getChildren().addAll(connectorPane, portImageView);
+    attachPortConnectorPane(port, result);
+    
+    attachPortImage(port, result);
 
     return result;
+  }
+  
+  private void fitPaneToTile(Pane pane) {
+    pane.setPrefWidth(TILE_SIZE);
+    pane.setPrefHeight(TILE_SIZE * TILE_ASPECT_RATIO);
+  }
+
+  private void attachPortConnectorPane(PortSlot port, Pane parentPane) {
+    StackPane result = new StackPane();
+    result.setAlignment(Pos.TOP_CENTER);
+    fitPaneToTile(result);
+
+    ImageView portConnectorImageView = new ImageView(portConnectorImage);
+    fitImageViewToTile(portConnectorImageView);
+
+    Label tradeRatioLabel = new Label(
+        String.format("%d:%d", port.kind.getPortNecessaryCount(), port.kind.getPortRequestedCount()));
+    tradeRatioLabel.setLayoutY(TILE_SIZE / 2);
+    tradeRatioLabel.setFont(new Font(8));
+    tradeRatioLabel.setRotate(180);
+
+    result.setRotate(60 * port.portDirection);
+    result.getChildren().addAll(portConnectorImageView, tradeRatioLabel);
+
+    parentPane.getChildren().add(result);
+  }
+  
+  private void attachPortImage(PortSlot port, Pane parentPane) {
+    Image portImage = port.kind.getPortImage();
+    ImageView result = new ImageView(portImage);
+    result.setFitWidth(TILE_SIZE * 0.6);
+    result.setFitHeight(TILE_SIZE * 0.6);
+
+    parentPane.getChildren().add(result);
   }
 
   private void initializePlayers() {
