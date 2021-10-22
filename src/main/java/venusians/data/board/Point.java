@@ -45,7 +45,15 @@ public class Point {
     return new Point(this.x / scalar, this.y / scalar);
   }
 
+  public Point mod(Point other) {
+    return new Point(this.x % other.x, this.y % other.y);
+  }
+
   public IntPoint asInt() {
     return new IntPoint((int) x, (int) y);
+  }
+
+  public String toString() {
+    return String.format("(%.2f, %.2f)", x, y);
   }
 }

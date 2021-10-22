@@ -26,11 +26,23 @@ public class IntPoint extends Point {
     return new IntPoint(-this.x, -this.y);
   }
 
-  public IntPoint time(IntPoint other) {
+  public IntPoint times(IntPoint other) {
     return new IntPoint(this.x * other.x, this.y * other.y);
   }
 
   public IntPoint times(int scalar) {
     return new IntPoint(this.x * scalar, this.y * scalar);
+  }
+
+  public IntPoint over(IntPoint other) {
+    return new IntPoint(this.x / other.x, this.y / other.y);
+  }
+
+  public IntPoint mod(IntPoint other) {
+    return new IntPoint(this.x % other.x, this.y % other.y);
+  }
+
+  public String toString() {
+    return String.format("(%d, %d)", x, y);
   }
 }
