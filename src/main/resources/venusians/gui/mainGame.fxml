@@ -22,9 +22,8 @@
 			<right>
 				<VBox alignment="CENTER_RIGHT" spacing="20.0">
 					<children>
-						<Button text="Build" />
-						<Button text="Trade" />
-						<Button onAction="#incrementVictoryPoints" text="Increment Victory Points" />
+						<Button fx:id="buildButton" onAction="#toggleBuildMode" text="Build" />
+						<Button fx:id="tradeButton" text="Trade" />
 					</children>
 				</VBox>
 			</right>

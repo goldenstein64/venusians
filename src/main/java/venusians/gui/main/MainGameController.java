@@ -21,9 +21,11 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import venusians.data.Game;
 import venusians.data.board.Board;
+import venusians.data.board.IntPoint;
 import venusians.data.board.Point;
 import venusians.data.board.buildable.Building;
 import venusians.data.board.tiles.MapSlot;
@@ -49,6 +51,12 @@ public class MainGameController {
   private boolean shouldSnapVvalue = false;
 
   private Image portConnectorImage = Images.load(MainGameController.class, "portConnector.png");
+
+  private enum GameState {
+    DEFAULT, BUILD;
+  }
+
+  private GameState gameState = GameState.DEFAULT;
 
   @FXML
   private AnchorPane mapPane;
@@ -78,18 +86,58 @@ public class MainGameController {
   private Button diceRollButton;
 
   @FXML
+  private Button buildButton;
+
+  @FXML
+  private Button tradeButton;
+
+  @FXML
   private Label rollResultLabel;
 
   @FXML
-  private void endGame(ActionEvent event) throws IOException {
+  private void endGame() throws IOException {
     App.setRoot("results");
   }
 
   @FXML
-  private void incrementVictoryPoints() {
-    Player currentPlayer = Players.getCurrentPlayer();
-    int oldValue = currentPlayer.getVictoryPoints();
-    currentPlayer.setVictoryPoints(oldValue + 1);
+  private void toggleBuildMode() {
+    if (gameState == GameState.BUILD) {
+      gameState = GameState.DEFAULT;
+      exitBuildMode();
+    } else {
+      gameState = GameState.BUILD;
+      enterBuildMode();
+    }
+  }
+
+  private void enterBuildMode() {
+    buildButton.setText("Finish Building");
+    tradeButton.setDisable(true);
+
+    // make the interface look like it's in build mode using a backdrop
+    Rectangle backdrop = new Rectangle();
+    backdrop.setFill(new Color(255/255.0, 143/255.0, 135/255.0, 1));
+    backdrop.widthProperty().bind(mainViewPane.widthProperty());
+    backdrop.heightProperty().bind(mainViewPane.heightProperty());
+
+    mainViewPane.getChildren().add(0, backdrop);
+
+    mainViewPane.setOnMouseMoved((event) -> {
+      Point mousePosition = new Point(event.getX(), event.getY());
+      Point hexMousePosition = HexTransform.toHexPosition(mousePosition);
+      IntPoint cornerPosition = HexTransform.getClosestHexCorner(hexMousePosition);
+
+    });
+  }
+
+  private void exitBuildMode() {
+    buildButton.setText("Build");
+    tradeButton.setDisable(false);
+
+    // assuming the backdrop is still in the back of the mainViewPane's children,
+    mainViewPane.getChildren().remove(0);
+
+    mainViewPane.setOnMouseMoved(null);
   }
 
   @FXML
@@ -177,7 +225,7 @@ public class MainGameController {
           throw new RuntimeException("MapSlot kind not found");
         }
 
-        slotPane.setLayoutX(guiPosition.x);
+        slotPane.setLayoutX(guiPosition.x - 25);
         slotPane.setLayoutY(guiPosition.y);
         slotPane.setAlignment(Pos.CENTER);
         

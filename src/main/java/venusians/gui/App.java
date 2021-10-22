@@ -17,7 +17,7 @@ public class App extends Application {
   /** Describes what happens when the window is first initialized. */
   @Override
   public void start(Stage stage) throws IOException {
-    scene = new Scene(loadFXML("setup"));
+    scene = new Scene(loadFXML("setup"), 1200, 600);
     stage.setScene(scene);
     stage.setTitle("The Venusians");
     stage.show();
