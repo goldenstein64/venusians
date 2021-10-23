@@ -2,13 +2,16 @@ package venusians.data.board.buildable;
 
 import java.util.Map.Entry;
 
+import javafx.scene.image.Image;
 import venusians.data.board.IntPoint;
 import venusians.data.cards.resource.ResourceCard;
 import venusians.data.cards.resource.ResourceCardMap;
 import venusians.data.players.Player;
+import venusians.util.Images;
 
 public class City extends Settlement {
 
+  private static final Image mapGraphic = Images.load(City.class, "city.png");
   private static final ResourceCardMap blueprint = new ResourceCardMap();
 
   {
@@ -34,5 +37,10 @@ public class City extends Settlement {
       cardMap.put(entry.getKey(), 2 * entry.getValue());
     }
     return cardMap;
+  }
+
+  @Override
+  public Image getMapGraphic() {
+    return mapGraphic;
   }
 }

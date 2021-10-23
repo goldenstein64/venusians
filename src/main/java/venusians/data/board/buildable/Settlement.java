@@ -9,10 +9,11 @@ import venusians.data.board.tiles.TileSlot;
 import venusians.data.cards.resource.ResourceCard;
 import venusians.data.cards.resource.ResourceCardMap;
 import venusians.data.players.Player;
+import venusians.util.Images;
 
 public class Settlement implements Building {
 
-  private static final Image image = new Image("");
+  private static final Image mapGraphic = Images.load(Settlement.class, "settlement.png");
   public static final ResourceCardMap blueprint = new ResourceCardMap();
 
   {
@@ -46,7 +47,7 @@ public class Settlement implements Building {
 
   @Override
   public Image getImage() {
-    return image;
+    return mapGraphic;
   }
 
   @Override
@@ -57,11 +58,7 @@ public class Settlement implements Building {
   public ResourceCardMap getResources() {
     ResourceCardMap result = new ResourceCardMap();
     MapSlot[][] map = Board.getMap();
-    for (
-      int i = positionType == PositionType.EVEN_CORNER ? 0 : 1;
-      i < Board.firstOrderOffsets.length;
-      i += 2
-    ) {
+    for (int i = positionType == PositionType.EVEN_CORNER ? 0 : 1; i < Board.firstOrderOffsets.length; i += 2) {
       IntPoint offset = Board.firstOrderOffsets[i];
       IntPoint newPosition = position.plus(offset);
       MapSlot mapSlot = map[newPosition.x][newPosition.y];
@@ -74,7 +71,12 @@ public class Settlement implements Building {
         result.put(resource, oldValue);
       }
     }
-    
+
     return result;
+  }
+  
+  @Override
+  public Image getMapGraphic() {
+    return mapGraphic;
   }
 }
