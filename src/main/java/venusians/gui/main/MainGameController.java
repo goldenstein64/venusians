@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -25,9 +24,10 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import venusians.data.Game;
 import venusians.data.board.Board;
-import venusians.data.board.IntPoint;
 import venusians.data.board.Point;
 import venusians.data.board.buildable.Building;
+import venusians.data.board.buildable.City;
+import venusians.data.board.buildable.Settlement;
 import venusians.data.board.tiles.MapSlot;
 import venusians.data.board.tiles.PortSlot;
 import venusians.data.board.tiles.TileSlot;
@@ -43,56 +43,39 @@ import venusians.util.Images;
 
 public class MainGameController {
 
-  private double TILE_ASPECT_RATIO = Math.sqrt(3) / 2;
+  public static final double TILE_ASPECT_RATIO = Math.sqrt(3) / 2;
 
-  private final int HISTORY_RANGE = 20;
-  private final double TILE_SIZE = 100;
+  private static final int HISTORY_RANGE = 20;
+  public static final double TILE_SIZE = 100;
+  public static final double BUILDING_SIZE = 35;
 
   private boolean shouldSnapVvalue = false;
 
   private Image portConnectorImage = Images.load(MainGameController.class, "portConnector.png");
+
+  private BuildModeController currentBuildModeController;
+  private BuildableRenderer buildableRenderer;
 
   private enum GameState {
     DEFAULT, BUILD;
   }
 
   private GameState gameState = GameState.DEFAULT;
+  private Rectangle buildModeBackdrop;
 
-  @FXML
-  private AnchorPane mapPane;
-
-  @FXML
-  private Label victoryPointsValueLabel;
-
-  @FXML
-  private TextField chatPrompt;
-
-  @FXML
-  private VBox chatHistory;
-
-  @FXML
-  private Pane developmentPane;
-
-  @FXML
-  private Pane resourcePane;
-
-  @FXML
-  private StackPane mainViewPane;
-
-  @FXML
-  private ScrollPane chatScrollPane;
-
-  @FXML
-  private Button diceRollButton;
-
-  @FXML
-  private Button buildButton;
-
-  @FXML
-  private Button tradeButton;
-
-  @FXML
-  private Label rollResultLabel;
+  @FXML private AnchorPane mapPane;
+  @FXML private Label victoryPointsValueLabel;
+  @FXML private TextField chatPrompt;
+  @FXML private VBox chatHistory;
+  @FXML private Pane developmentPane;
+  @FXML private Pane resourcePane;
+  @FXML private StackPane mainViewPane;
+  @FXML private ScrollPane chatScrollPane;
+  @FXML private Button diceRollButton;
+  @FXML private Button buildButton;
+  @FXML private Button tradeButton;
+  @FXML private Label rollResultLabel;
+  @FXML private Button endTurnButton;
 
   @FXML
   private void endGame() throws IOException {
@@ -100,12 +83,20 @@ public class MainGameController {
   }
 
   @FXML
+  private void endTurn() {
+    Players.nextTurn();
+    // reload the interface?
+  }
+
+  @FXML
   private void toggleBuildMode() {
     if (gameState == GameState.BUILD) {
       gameState = GameState.DEFAULT;
       exitBuildMode();
+      currentBuildModeController = null;
     } else {
       gameState = GameState.BUILD;
+      currentBuildModeController = new BuildModeController(mapPane, buildableRenderer);
       enterBuildMode();
     }
   }
@@ -115,19 +106,16 @@ public class MainGameController {
     tradeButton.setDisable(true);
 
     // make the interface look like it's in build mode using a backdrop
-    Rectangle backdrop = new Rectangle();
-    backdrop.setFill(new Color(255/255.0, 143/255.0, 135/255.0, 1));
-    backdrop.widthProperty().bind(mainViewPane.widthProperty());
-    backdrop.heightProperty().bind(mainViewPane.heightProperty());
+    buildModeBackdrop = new Rectangle();
+    buildModeBackdrop.setFill(new Color(255 / 255.0, 143 / 255.0, 135 / 255.0, 1));
+    buildModeBackdrop.widthProperty().bind(mainViewPane.widthProperty());
+    buildModeBackdrop.heightProperty().bind(mainViewPane.heightProperty());
 
-    mainViewPane.getChildren().add(0, backdrop);
+    mainViewPane.getChildren().add(0, buildModeBackdrop);
 
-    mainViewPane.setOnMouseMoved((event) -> {
-      Point mousePosition = new Point(event.getX(), event.getY());
-      Point hexMousePosition = HexTransform.toHexPosition(mousePosition);
-      IntPoint cornerPosition = HexTransform.getClosestHexCorner(hexMousePosition);
-
-    });
+    mainViewPane.setOnMousePressed(currentBuildModeController::onMousePressed);
+    mainViewPane.setOnMouseDragged(currentBuildModeController::onMouseDragged);
+    mainViewPane.setOnMouseReleased(currentBuildModeController::onMouseReleased);
   }
 
   private void exitBuildMode() {
@@ -135,9 +123,16 @@ public class MainGameController {
     tradeButton.setDisable(false);
 
     // assuming the backdrop is still in the back of the mainViewPane's children,
-    mainViewPane.getChildren().remove(0);
+    if (buildModeBackdrop != null) {
+      mainViewPane.getChildren().remove(buildModeBackdrop);
+      buildModeBackdrop = null;
+    }
 
-    mainViewPane.setOnMouseMoved(null);
+    mainViewPane.setOnMousePressed(null);
+    mainViewPane.setOnMouseDragged(null);
+    mainViewPane.setOnMouseReleased(null);
+
+    currentBuildModeController.applySuggestions();
   }
 
   @FXML
@@ -185,11 +180,11 @@ public class MainGameController {
 
   @FXML
   private void initialize() {
-
+    buildableRenderer = new BuildableRenderer(mapPane);
 
     Game.startGame();
 
-    createMap();
+    renderMap();
     initializePlayers();
     applyChatSnap();
 
@@ -203,18 +198,28 @@ public class MainGameController {
     currentPlayer.receiveResource(ResourceCard.BRICK);
     currentPlayer.receiveResource(ResourceCard.WOOD);
 
-    displayCards(currentPlayer.getDevelopmentHand());
+    currentPlayer.receiveResources(Settlement.getBlueprint());
+    currentPlayer.receiveResources(Settlement.getBlueprint());
+    currentPlayer.receiveResources(City.getBlueprint());
 
-    displayCards(currentPlayer.getResourceHand());
+    // currentPlayer.buildStartingSettlement(new IntPoint(5, 5));
+    // Settlement settlement2 = currentPlayer.buildStartingSettlement(new IntPoint(6, 6));
+
+    // currentPlayer.upgradeSettlement(settlement2);
+
+    displayCards(currentPlayer.getDevelopmentHand());
+    displayCards(currentPlayer.getResourceHand().toList());
+
+    buildableRenderer.updateGraphics(Board.getBuildables());
   }
 
-  private void createMap() {
+  private void renderMap() {
     for (MapSlot[] row : Board.getMap()) {
       for (MapSlot mapSlot : row) {
         if (mapSlot == null)
           continue;
 
-        Point guiPosition = HexTransform.toGuiPosition(mapSlot.position);
+        Point guiPosition = HexTransform.toGuiSpace(mapSlot.position);
 
         StackPane slotPane;
         if (mapSlot instanceof TileSlot) {
@@ -294,7 +299,8 @@ public class MainGameController {
     Label tradeRatioLabel = new Label(
         String.format("%d:%d", port.kind.getPortNecessaryCount(), port.kind.getPortRequestedCount()));
     tradeRatioLabel.setLayoutY(TILE_SIZE / 2);
-    tradeRatioLabel.setFont(new Font(8));
+    tradeRatioLabel.setFont(new Font("System Bold", 8));
+    tradeRatioLabel.setTextFill(Color.WHITE );
     tradeRatioLabel.setRotate(180);
 
     result.setRotate(60 * port.portDirection);
@@ -367,15 +373,16 @@ public class MainGameController {
   }
 
   private <T extends HasCard> void displayCardsOnPane(ArrayList<T> cards, Pane cardPane) {
+    double offsetPerCard = Math.min(80, ((1200.0 - 150) / 2) / cards.size());
     for (int i = 0; i < cards.size(); i++) {
       T card = cards.get(i);
       Image cardImage = card.getCardImage();
       ImageView cardImageView = new ImageView(cardImage);
       cardImageView.setFitWidth(100);
       cardImageView.setFitHeight(100);
-      double offset = 80 * (i - (cards.size() - 1) / 2.0) - 50;
+      double offset = offsetPerCard * (i - (cards.size() - 1) / 2.0) - 50;
       cardImageView.layoutXProperty().bind(cardPane.widthProperty().divide(2.0).add(offset));
-      cardImageView.setLayoutY(37.5);
+      cardImageView.setLayoutY(0);
       cardPane.getChildren().add(cardImageView);
     }
   }

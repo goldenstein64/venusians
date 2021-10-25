@@ -2,8 +2,10 @@ package venusians.data.board;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+
 import venusians.data.Game;
 import venusians.data.board.buildable.Buildable;
 import venusians.data.board.buildable.Building;
@@ -13,7 +15,6 @@ import venusians.data.board.tiles.MapSlot;
 import venusians.data.board.tiles.PortSlot;
 import venusians.data.board.tiles.TileSlot;
 import venusians.data.lifecycle.GameOptions;
-import venusians.util.Event;
 
 public class Board {
 
@@ -22,11 +23,11 @@ public class Board {
   private static HashMap<Integer, ArrayList<TileSlot>> rollValueMap;
   private static HashSet<Buildable> allBuildables = new HashSet<Buildable>();
   private static Building[][] buildingMap;
-  private static ArrayList<Road>[][] roadMap;
-  private static Point robberPosition;
+  private static HashSet<Road>[][] roadMap;
+  private static IntPoint robberPosition;
 
   /** Lists all offsets that are 2 units away */
-  public static final IntPoint[] secondOrderOffsets = new IntPoint[] {
+  public static final IntPoint[] SECOND_ORDER_OFFSETS = new IntPoint[] {
     new IntPoint(1, 2),
     new IntPoint(2, 1),
     new IntPoint(1, -1),
@@ -36,7 +37,7 @@ public class Board {
   };
 
   /** Lists all offsets that are 1 unit away */
-  public static final IntPoint[] firstOrderOffsets = new IntPoint[] {
+  public static final IntPoint[] FIRST_ORDER_OFFSETS = new IntPoint[] {
     new IntPoint(1, 1),
     new IntPoint(1, 0),
     new IntPoint(0, -1),
@@ -54,27 +55,12 @@ public class Board {
     public static PositionType valueOf(IntPoint position) {
       switch ((position.x - position.y) % 3) {
         case 0:
-          return TILE;
-        case 1:
           return ODD_CORNER;
-        default: // case 2:
+        case 1:
           return EVEN_CORNER;
+        default: // case 2:
+          return TILE;
       }
-    }
-  }
-
-  public static Event<Buildable> onBuildableAdded = new Event<Buildable>();
-
-  public static Event<BuildableUpgradedArgs> onBuildableUpgraded = new Event<BuildableUpgradedArgs>();
-
-  public static class BuildableUpgradedArgs {
-
-    public final Buildable from;
-    public final Buildable to;
-
-    public BuildableUpgradedArgs(Buildable from, Buildable to) {
-      this.from = from;
-      this.to = to;
     }
   }
 
@@ -96,7 +82,7 @@ public class Board {
 
     slotMap = new MapSlot[mapPreset.length][mapPreset.width];
     buildingMap = new Building[mapPreset.length][mapPreset.width];
-    roadMap = (ArrayList<Road>[][]) new ArrayList[mapPreset.length][mapPreset.width];
+    roadMap = (HashSet<Road>[][]) new HashSet[mapPreset.length][mapPreset.width];
     rollValueMap = new HashMap<>();
 
     if (gameOptions.areTilePositionsRandomized)
@@ -182,14 +168,11 @@ public class Board {
     if (buildable instanceof Road) {
       Road road = (Road) buildable;
 
-      IntPoint position1 = road.getPosition1();
-      IntPoint position2 = road.getPosition2();
+      HashSet<Road> roadSet1 = getRoadsAt(road.getPosition1());
+      HashSet<Road> roadSet2 = getRoadsAt(road.getPosition2());
 
-      ArrayList<Road> roadList1 = roadMap[position1.x][position1.y];
-      ArrayList<Road> roadList2 = roadMap[position2.x][position2.y];
-
-      roadList1.add(road);
-      roadList2.add(road);
+      roadSet1.add(road);
+      roadSet2.add(road);
     } else if (buildable instanceof Building) {
       Building building = (Building) buildable;
 
@@ -197,17 +180,48 @@ public class Board {
 
       buildingMap[position.x][position.y] = building;
     }
-    onBuildableAdded.fire(buildable);
+  }
+
+  public static void addBuildables(Collection<Buildable> buildables) {
+    for (Buildable buildable : buildables) {
+      addBuildable(buildable);
+    }
+  }
+
+  public static void removeBuildable(Buildable buildable) {
+    allBuildables.remove(buildable);
+    if (buildable instanceof Road) {
+      Road road = (Road) buildable;
+
+      HashSet<Road> roadSet1 = getRoadsAt(road.getPosition1());
+      HashSet<Road> roadSet2 = getRoadsAt(road.getPosition2());
+
+      HashSet<Road> intersection = new HashSet<>(roadSet1);
+      intersection.retainAll(roadSet2);
+
+      if (intersection.size() > 1) {
+        throw new RuntimeException("Two roads overlap the same position pair");
+      } else if (intersection.size() < 1) {
+        return;
+      }
+  
+      Road selectedRoad = intersection.iterator().next();
+      roadSet1.remove(selectedRoad);
+      roadSet2.remove(selectedRoad);
+    }
   }
 
   public static void upgradeBuildable(Buildable from, Buildable to) {
     allBuildables.remove(from);
     allBuildables.add(to);
-    onBuildableUpgraded.fire(new BuildableUpgradedArgs(from, to));
   }
 
-  public static Point getRobberPosition() {
+  public static IntPoint getRobberPosition() {
     return robberPosition;
+  }
+
+  public static void setRobberPosition(IntPoint newPosition) {
+    robberPosition = newPosition;
   }
 
   public static TileSlot[] getTileSlotsForRollValue(int rollValue) {
@@ -220,7 +234,7 @@ public class Board {
   public static Building[] getBuildingsForTileSlot(TileSlot slot) {
     IntPoint tilePosition = slot.position;
     ArrayList<Building> buildingList = new ArrayList<Building>();
-    for (IntPoint offset : firstOrderOffsets) {
+    for (IntPoint offset : FIRST_ORDER_OFFSETS) {
       IntPoint buildingPosition = tilePosition.plus(offset);
       Building building = buildingMap[buildingPosition.x][buildingPosition.y];
       if (building != null) {
@@ -228,8 +242,20 @@ public class Board {
       }
     }
 
-    Building[] result = new Building[buildingList.size()];
-    buildingList.toArray(result);
+    return buildingList.toArray(new Building[buildingList.size()]);
+  }
+
+  public static Building getBuildingAt(IntPoint position) {
+    return buildingMap[position.x][position.y];
+  }
+
+  public static HashSet<Road> getRoadsAt(IntPoint position) {
+    HashSet<Road> result = roadMap[position.x][position.y];
+    if (result == null) {
+      result = new HashSet<Road>();
+      roadMap[position.x][position.y] = result;
+    }
+
     return result;
   }
 }

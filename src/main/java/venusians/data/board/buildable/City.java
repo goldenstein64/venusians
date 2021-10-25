@@ -9,18 +9,18 @@ import venusians.data.cards.resource.ResourceCardMap;
 import venusians.data.players.Player;
 import venusians.util.Images;
 
-public class City extends Settlement {
+public class City extends Building {
 
-  private static final Image mapGraphic = Images.load(City.class, "city.png");
-  private static final ResourceCardMap blueprint = new ResourceCardMap();
+  public static final Image MAP_GRAPHIC = Images.load(City.class, "city.png");
+  public static final ResourceCardMap BLUEPRINT = new ResourceCardMap();
 
-  {
-    blueprint.put(ResourceCard.ORE, 3);
-    blueprint.put(ResourceCard.WHEAT, 2);
+  static {
+    BLUEPRINT.put(ResourceCard.ORE, 3);
+    BLUEPRINT.put(ResourceCard.WHEAT, 2);
   }
 
   public static ResourceCardMap getBlueprint() {
-    return blueprint;
+    return BLUEPRINT;
   }
 
   public City(Player owner, IntPoint position) {
@@ -40,7 +40,7 @@ public class City extends Settlement {
   }
 
   @Override
-  public Image getMapGraphic() {
-    return mapGraphic;
+  public Image getImage() {
+    return MAP_GRAPHIC;
   }
 }

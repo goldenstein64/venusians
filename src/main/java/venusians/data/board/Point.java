@@ -49,11 +49,33 @@ public class Point {
     return new Point(this.x % other.x, this.y % other.y);
   }
 
+  public double distanceFrom(Point other) {
+    return Math.sqrt(distanceSquaredFrom(other));
+  }
+
+  public double distanceSquaredFrom(Point other) {
+    double diffX = other.x - this.x;
+    double diffY = other.y - this.y;
+    return diffX * diffX + diffY * diffY;
+  }
+
+  public double magnitudeSquared() {
+    return this.x * this.x + this.y * this.y;
+  }
+
+  public double magnitude() {
+    return Math.sqrt(this.magnitudeSquared());
+  }
+
+  public Point unit() {
+    return this.over(this.magnitude());
+  }
+
   public IntPoint asInt() {
-    return new IntPoint((int) x, (int) y);
+    return new IntPoint((int) Math.round(this.x), (int) Math.round(this.y));
   }
 
   public String toString() {
-    return String.format("(%.2f, %.2f)", x, y);
+    return String.format("(%.2f, %.2f)", this.x, this.y);
   }
 }

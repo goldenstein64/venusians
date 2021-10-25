@@ -10,32 +10,41 @@ public class HexTransform {
   private static final IntPoint GUI_OFFSET = new IntPoint(180, 100);
   private static final double GUI_SCALE = 50;
 
-  private static final IntPoint CORNER_CASE_SIZE = new IntPoint(1, 3);
-
   /**
    * Takes a position in hexagonal space and converts it to GUI space.
    * @param position
    * @return
    */
-  public static Point toGuiPosition(Point position) {
-    return new Point(position.x + position.y * X_ANGLE, position.y * Y_ANGLE)
-      .times(GUI_SCALE)
-      .plus(GUI_OFFSET);
+  public static Point toGuiSpace(Point position) {
+    return toNormalSpace(position).times(GUI_SCALE).plus(GUI_OFFSET);
+  }
+  
+  public static Point toNormalSpace(Point position) {
+    return new Point(position.x + position.y * X_ANGLE, position.y * Y_ANGLE);
   }
 
-  public static Point toHexPosition(Point position) {
+  public static Point toHexSpace(Point position) {
     Point scaledPosition = position.minus(GUI_OFFSET).over(GUI_SCALE);
-    double newX =
-      (Y_ANGLE * scaledPosition.x - X_ANGLE * scaledPosition.y) / Y_ANGLE;
+    double newX = (Y_ANGLE * scaledPosition.x - X_ANGLE * scaledPosition.y) / Y_ANGLE;
     double newY = scaledPosition.y / Y_ANGLE;
     return new Point(newX, newY);
   }
 
-  public static Point getClosestCorner(Point position) {
-    return toGuiPosition(getClosestHexCorner(toHexPosition(position)));
+  /**
+   * Takes a position in GUI space and returns the closest tile corner in GUI space.
+   * @param position
+   * @return The closest corner
+   */
+  public static Point toGuiCorner(Point position) {
+    return toGuiSpace(toHexCorner(toHexSpace(position)));
   }
 
-  public static IntPoint getClosestHexCorner(Point position) {
+  /**
+   * Takes a position in Hexagonal space and returns the closest tile corner in Hexagonal space.
+   * @param position
+   * @return The closest corner
+   */
+  public static IntPoint toHexCorner(Point position) {
     IntPoint intPosition = new IntPoint(
       (int) Math.floor(position.x), 
       (int) Math.floor(position.y)

@@ -52,7 +52,7 @@
                      </content>
                   </TitledPane>
                   <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                  <Button fx:id="secondaryButton" alignment="CENTER" onAction="#endGame" text="End Turn" />
+                  <Button fx:id="endTurnButton" alignment="CENTER" onAction="#endTurn" text="End Turn" />
                   <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
             		<HBox alignment="TOP_CENTER" spacing="10.0">
             			<children>
@@ -75,16 +75,16 @@
             </HBox>
          </top>
          <bottom>
-            <HBox alignment="CENTER">
+            <HBox alignment="CENTER" prefHeight="80.0">
                <children>
-                  <Pane fx:id="developmentPane" prefHeight="100.0" prefWidth="50.0" HBox.hgrow="ALWAYS" />
-                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0">
+                  <Pane fx:id="developmentPane" prefHeight="80.0" prefWidth="50.0" HBox.hgrow="ALWAYS" />
+                  <VBox alignment="CENTER" prefWidth="100.0" spacing="20.0">
                      <children>
                         <Button fx:id="diceRollButton" minWidth="75.0" mnemonicParsing="false" onAction="#rollDice" text="Roll Dice" />
                         <Label fx:id="rollResultLabel" />
                      </children>
                   </VBox>
-                  <Pane fx:id="resourcePane" prefHeight="50.0" prefWidth="50.0" HBox.hgrow="ALWAYS" />
+                  <Pane fx:id="resourcePane" prefHeight="80.0" prefWidth="50.0" HBox.hgrow="ALWAYS" />
                </children>
                <padding>
                   <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />

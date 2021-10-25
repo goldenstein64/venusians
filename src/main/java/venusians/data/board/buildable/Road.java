@@ -1,6 +1,5 @@
 package venusians.data.board.buildable;
 
-import javafx.scene.image.Image;
 import venusians.data.board.IntPoint;
 import venusians.data.cards.resource.ResourceCard;
 import venusians.data.cards.resource.ResourceCardMap;
@@ -8,10 +7,9 @@ import venusians.data.players.Player;
 
 public class Road implements Buildable {
 
-  private static final Image image = new Image("");
   private static final ResourceCardMap blueprint = new ResourceCardMap();
 
-  {
+  static {
     blueprint.put(ResourceCard.WOOD, 1);
     blueprint.put(ResourceCard.BRICK, 1);
   }
@@ -41,11 +39,6 @@ public class Road implements Buildable {
 
   public IntPoint getPosition2() {
     return position2;
-  }
-
-  @Override
-  public Image getImage() {
-    return image;
   }
 
   public Player getOwner() {

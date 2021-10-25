@@ -14,7 +14,6 @@ import venusians.data.cards.TradeRequest;
 import venusians.data.cards.development.DevelopmentCard;
 import venusians.data.cards.development.DevelopmentCardList;
 import venusians.data.cards.resource.ResourceCard;
-import venusians.data.cards.resource.ResourceCardList;
 import venusians.data.cards.resource.ResourceCardMap;
 import venusians.data.chat.Chat;
 import venusians.data.chat.Message;
@@ -57,7 +56,19 @@ public class Player {
     resources.addResources(resourceCard, 1);
   }
 
-  public ResourceCardList getResourceHand() {
+  public void receiveResources(ResourceCard resourceCard, int count) {
+    resources.addResources(resourceCard, count);
+  }
+
+  public void receiveResources(ResourceCardMap blueprint) {
+    resources.getResourceHand().add(blueprint);
+  }
+
+  public void removeResources(ResourceCardMap blueprint) {
+    resources.getResourceHand().remove(blueprint);
+  }
+
+  public ResourceCardMap getResourceHand() {
     return this.resources.getResourceHand();
   }
 
@@ -103,7 +114,7 @@ public class Player {
     Chat.add(message);
   }
 
-  public void buildRoad(IntPoint position1, IntPoint position2) {
+  public Road buildRoad(IntPoint position1, IntPoint position2) {
     if (roadPool <= 0) {
       throw new RuntimeException("Road pool is empty");
     }
@@ -112,9 +123,11 @@ public class Player {
     this.resources.removeResources(Road.getBlueprint());
     Road newRoad = new Road(this, position1, position2);
     Board.addBuildable(newRoad);
+
+    return newRoad;
   }
 
-  public void buildSettlement(IntPoint position) {
+  public Settlement buildSettlement(IntPoint position) {
     throwIfPositionIsntConnectedByRoad(position);
 
     if (settlementPool <= 0) {
@@ -123,7 +136,31 @@ public class Player {
     settlementPool -= 1;
 
     this.resources.removeResources(Settlement.getBlueprint());
-    buildStartingSettlement(position);
+    return buildStartingSettlement(position);
+  }
+
+  public Settlement buildStartingSettlement(IntPoint position) {
+    Settlement newSettlement = new Settlement(this, position);
+    Board.addBuildable(newSettlement);
+    setVictoryPoints(victoryPoints + 1);
+
+    return newSettlement;
+  }
+
+  public City upgradeSettlement(Settlement settlement) {
+    throwIfSettlementIsntOnBoard(settlement);
+    if (cityPool <= 0) {
+      throw new RuntimeException("City pool is empty");
+    }
+    cityPool -= 1;
+    settlementPool += 1;
+
+    this.resources.removeResources(City.getBlueprint());
+    City newCity = new City(this, settlement.getPosition());
+    Board.upgradeBuildable(settlement, newCity);
+    setVictoryPoints(victoryPoints + 1);
+
+    return newCity;
   }
 
   private void throwIfPositionIsntConnectedByRoad(IntPoint position) {
@@ -143,26 +180,6 @@ public class Player {
     if (!hasConnection) {
       throw new IllegalArgumentException("This position is not connected by a road.");
     }
-  }
-
-  public void buildStartingSettlement(IntPoint position) {
-    Settlement newSettlement = new Settlement(this, position);
-    Board.addBuildable(newSettlement);
-    setVictoryPoints(victoryPoints + 1);
-  }
-
-  public void upgradeSettlement(Settlement settlement) {
-    throwIfSettlementIsntOnBoard(settlement);
-    if (cityPool <= 0) {
-      throw new RuntimeException("City pool is empty");
-    }
-    cityPool -= 1;
-    settlementPool += 1;
-
-    this.resources.removeResources(City.getBlueprint());
-    City newCity = new City(this, settlement.getPosition());
-    Board.upgradeBuildable(settlement, newCity);
-    setVictoryPoints(victoryPoints + 1);
   }
 
   private void throwIfSettlementIsntOnBoard(Settlement settlement) {
