@@ -216,16 +216,11 @@ public final class Board {
     HashSet<Road> roadSet1 = getRoadsAt(road.getPosition1());
     HashSet<Road> roadSet2 = getRoadsAt(road.getPosition2());
 
-    HashSet<Road> intersection = new HashSet<>(roadSet1);
-    intersection.retainAll(roadSet2);
+    Road selectedRoad = getRoadBetween(
+      road.getPosition1(),
+      road.getPosition2()
+    );
 
-    if (intersection.size() > 1) {
-      throw new RuntimeException("Two roads overlap the same position pair");
-    } else if (intersection.size() < 1) {
-      return;
-    }
-
-    Road selectedRoad = intersection.iterator().next();
     roadSet1.remove(selectedRoad);
     roadSet2.remove(selectedRoad);
   }
@@ -305,6 +300,22 @@ public final class Board {
     }
 
     return result;
+  }
+
+  public static Road getRoadBetween(IntPoint position1, IntPoint position2) {
+    HashSet<Road> roadSet1 = getRoadsAt(position1);
+    HashSet<Road> roadSet2 = getRoadsAt(position2);
+
+    HashSet<Road> intersection = new HashSet<>(roadSet1);
+    intersection.retainAll(roadSet2);
+
+    if (intersection.size() > 1) {
+      throw new RuntimeException("Two roads overlap the same position pair");
+    } else if (intersection.size() < 1) {
+      return null;
+    }
+
+    return intersection.iterator().next();
   }
 
   public static MapSlot getSlotAt(IntPoint position) {
