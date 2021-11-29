@@ -21,23 +21,31 @@ public class ColorTableCell<T> extends TableCell<T, Color> {
 
   /**
    * Creates a new table cell with color picker
-   * 
+   *
    * @param column The column this table cell belongs to.
    */
   public ColorTableCell(TableColumn<T, Color> column) {
     this.colorPicker = new ColorPicker();
     this.colorPicker.editableProperty().bind(column.editableProperty());
     this.colorPicker.disableProperty().bind(column.editableProperty().not());
-    this.colorPicker.setOnShowing(event -> {
-      final TableView<T> tableView = getTableView();
-      tableView.getSelectionModel().select(getTableRow().getIndex());
-      tableView.edit(tableView.getSelectionModel().getSelectedIndex(), column);
-    });
-    this.colorPicker.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if (isEditing()) {
-        commitEdit(newValue);
-      }
-    });
+    this.colorPicker.setOnShowing(
+        event -> {
+          final TableView<T> tableView = getTableView();
+          tableView.getSelectionModel().select(getTableRow().getIndex());
+          tableView.edit(
+            tableView.getSelectionModel().getSelectedIndex(),
+            column
+          );
+        }
+      );
+    this.colorPicker.valueProperty()
+      .addListener(
+        (observable, oldValue, newValue) -> {
+          if (isEditing()) {
+            commitEdit(newValue);
+          }
+        }
+      );
     setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
   }
 
