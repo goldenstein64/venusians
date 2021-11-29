@@ -1,5 +1,7 @@
 package venusians.gui.main;
 
+import venusians.data.board.Board;
+import venusians.data.board.Board.PositionType;
 import venusians.data.board.IntPoint;
 import venusians.data.board.Point;
 
@@ -12,61 +14,142 @@ public class HexTransform {
 
   /**
    * Takes a position in hexagonal space and converts it to GUI space.
-   * @param position
+   * @param hexPosition
    * @return
    */
-  public static Point toGuiSpace(Point position) {
-    return toNormalSpace(position).times(GUI_SCALE).plus(GUI_OFFSET);
-  }
-  
-  public static Point toNormalSpace(Point position) {
-    return new Point(position.x + position.y * X_ANGLE, position.y * Y_ANGLE);
+  public static Point hexToGuiSpace(Point hexPosition) {
+    return hexToNormalSpace(hexPosition).times(GUI_SCALE).plus(GUI_OFFSET);
   }
 
-  public static Point toHexSpace(Point position) {
-    Point scaledPosition = position.minus(GUI_OFFSET).over(GUI_SCALE);
-    double newX = (Y_ANGLE * scaledPosition.x - X_ANGLE * scaledPosition.y) / Y_ANGLE;
-    double newY = scaledPosition.y / Y_ANGLE;
-    return new Point(newX, newY);
+  public static Point hexToNormalSpace(Point hexPosition) {
+    return new Point(
+      hexPosition.x + hexPosition.y * X_ANGLE,
+      hexPosition.y * Y_ANGLE
+    );
+  }
+
+  public static Point normalToHexSpace(Point normalPosition) {
+    return new Point(
+      (Y_ANGLE * normalPosition.x - X_ANGLE * normalPosition.y) / Y_ANGLE,
+      normalPosition.y / Y_ANGLE
+    );
+  }
+
+  public static Point guiToHexSpace(Point guiPosition) {
+    Point scaledPosition = (guiPosition.minus(GUI_OFFSET)).over(GUI_SCALE);
+    return normalToHexSpace(scaledPosition);
   }
 
   /**
    * Takes a position in GUI space and returns the closest tile corner in GUI space.
-   * @param position
+   * @param guiPosition
    * @return The closest corner
    */
-  public static Point toGuiCorner(Point position) {
-    return toGuiSpace(toHexCorner(toHexSpace(position)));
+  public static Point guiToGuiCorner(Point guiPosition) {
+    return hexToGuiSpace(hexToHexCorner(guiToHexSpace(guiPosition)));
+  }
+
+  public static IntPoint guiToHexCorner(Point guiPosition) {
+    return hexToHexCorner(guiToHexSpace(guiPosition));
+  }
+
+  public static IntPoint hexEstimateHexCorner(
+    IntPoint hexStart,
+    Point hexGoal
+  ) {
+    Point normalStart = HexTransform.hexToNormalSpace(hexStart);
+    Point normalGoal = HexTransform.hexToNormalSpace(hexGoal);
+
+    Point delta = normalGoal.minus(normalStart);
+    Point direction = delta.unit();
+
+    double angle = Math.atan2(direction.y, direction.x);
+    if (angle < 0) {
+      angle += 2 * Math.PI;
+    }
+
+    PositionType startType = PositionType.valueOf(hexStart);
+
+    IntPoint offset;
+    if (startType == PositionType.ODD_CORNER) {
+      offset = getOddCornerFromAngle(angle);
+    } else if (startType == PositionType.EVEN_CORNER) {
+      offset = getEvenCornerFromAngle(angle);
+    } else {
+      throw new RuntimeException("Unknown angle for position type of 'slot'");
+    }
+
+    return hexStart.plus(offset);
+  }
+
+  private static IntPoint getOddCornerFromAngle(double angle) {
+    if (3 * angle < Math.PI) {
+      return Board.FIRST_ORDER_OFFSETS[1];
+    } else if (angle < Math.PI) {
+      return Board.FIRST_ORDER_OFFSETS[3];
+    } else if (3 * angle < 5 * Math.PI) {
+      return Board.FIRST_ORDER_OFFSETS[5];
+    } else {
+      return Board.FIRST_ORDER_OFFSETS[1];
+    }
+  }
+
+  private static IntPoint getEvenCornerFromAngle(double angle) {
+    if (3 * angle < 2 * Math.PI) {
+      return Board.FIRST_ORDER_OFFSETS[2];
+    } else if (3 * angle < 4 * Math.PI) {
+      return Board.FIRST_ORDER_OFFSETS[4];
+    } else {
+      return Board.FIRST_ORDER_OFFSETS[0];
+    }
   }
 
   /**
    * Takes a position in Hexagonal space and returns the closest tile corner in Hexagonal space.
-   * @param position
+   * @param hexPosition
    * @return The closest corner
    */
-  public static IntPoint toHexCorner(Point position) {
-    IntPoint intPosition = new IntPoint(
-      (int) Math.floor(position.x), 
-      (int) Math.floor(position.y)
-    );
-    
-    int xOffset = (-intPosition.x + 2) % 3;
+  public static IntPoint hexToHexCorner(Point hexPosition) {
+    IntPoint positionOffset = getPositionOffset(hexPosition);
 
-    IntPoint positionOffset = new IntPoint(
-      intPosition.x, 
-      3 * (int) Math.floor((intPosition.y + xOffset) / 3.0) - xOffset
-    );
-
-    Point positionCase = position.minus(positionOffset);
+    Point positionCase = hexPosition.minus(positionOffset);
 
     IntPoint result = getCornerByCase(positionCase).plus(positionOffset);
 
     return result;
   }
 
-  private static IntPoint getCornerByCase(Point position) {
-    double x = position.x;
-    double y = position.y;
+  public static IntPoint hexToHexSlot(Point hexPosition) {
+    IntPoint positionOffset = getPositionOffset(hexPosition);
+
+    Point positionCase = hexPosition.minus(positionOffset);
+
+    IntPoint result = getSlotByCase(positionCase).plus(positionOffset);
+
+    return result;
+  }
+
+  public static IntPoint guiToHexSlot(Point guiPosition) {
+    return hexToHexSlot(guiToHexSpace(guiPosition));
+  }
+
+  private static IntPoint getPositionOffset(Point hexPosition) {
+    IntPoint intPosition = new IntPoint(
+      (int) Math.floor(hexPosition.x),
+      (int) Math.floor(hexPosition.y)
+    );
+
+    int xOffset = (-intPosition.x) % 3;
+
+    return new IntPoint(
+      intPosition.x,
+      3 * (int) Math.floor((intPosition.y + xOffset) / 3.0) - xOffset
+    );
+  }
+
+  private static IntPoint getCornerByCase(Point hexPosition) {
+    double x = hexPosition.x;
+    double y = hexPosition.y;
 
     if (y < x) {
       return new IntPoint(1, 0);
@@ -78,6 +161,19 @@ public class HexTransform {
       return new IntPoint(1, 2);
     } else {
       return new IntPoint(1, 3);
+    }
+  }
+
+  private static IntPoint getSlotByCase(Point hexPosition) {
+    double x = hexPosition.x;
+    double y = hexPosition.y;
+
+    if (y < -x + 1) {
+      return new IntPoint(0, 0);
+    } else if (y < 2) {
+      return new IntPoint(1, 1);
+    } else {
+      return new IntPoint(0, 3);
     }
   }
 }
