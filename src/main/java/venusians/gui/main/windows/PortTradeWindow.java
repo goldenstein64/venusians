@@ -103,6 +103,7 @@ public class PortTradeWindow {
 
   private void onRequestedResourceChosen(ResourceCard chosenResource) {
     this.requestedResource = chosenResource;
+    mainViewPane.getChildren().remove(requestedController.getRootPane());
     returnControlWithSuggestions();
   }
 

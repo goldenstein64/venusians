@@ -89,6 +89,7 @@ public class SelfTradeWindow {
 
   private void onRequestedResourceChosen(ResourceCard chosenResource) {
     this.requestedResource = chosenResource;
+    mainViewPane.getChildren().remove(requestedController.getRootPane());
     returnControlWithSuggestions();
   }
 
@@ -100,6 +101,6 @@ public class SelfTradeWindow {
   }
 
   private void returnControlWithoutSuggestions() {
-    parentController.continueHandlingTradingWithPort();
+    parentController.continueHandlingTradingWithSelf();
   }
 }
