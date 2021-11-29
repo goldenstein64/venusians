@@ -70,6 +70,7 @@ import venusians.gui.main.windows.DicePaneWindow;
 import venusians.gui.main.windows.PortTradeWindow;
 import venusians.gui.main.windows.ResourceAdditionWindow;
 import venusians.gui.main.windows.ResourceRemovalWindow;
+import venusians.gui.main.windows.SelfTradeWindow;
 import venusians.gui.main.windows.TradeWindow;
 
 public class MainGameController {
@@ -126,6 +127,9 @@ public class MainGameController {
 
   @FXML
   private Button tradeButton;
+
+  @FXML
+  private Button selfTradeButton;
 
   @FXML
   private Label rollResultLabel;
@@ -189,6 +193,7 @@ public class MainGameController {
         cancelBuildButton.setVisible(false);
         buyDevelopmentCardButton.setDisable(true);
         tradeButton.setDisable(true);
+        selfTradeButton.setDisable(true);
 
         diceRollButton.setDisable(false);
         break;
@@ -201,6 +206,7 @@ public class MainGameController {
         buildButton.setDisable(false);
         buyDevelopmentCardButton.setDisable(false);
         tradeButton.setDisable(false);
+        selfTradeButton.setDisable(false);
         break;
       case BUILD:
         unbindMouse();
@@ -208,6 +214,7 @@ public class MainGameController {
         diceRollButton.setDisable(true);
         buyDevelopmentCardButton.setDisable(true);
         tradeButton.setDisable(true);
+        selfTradeButton.setDisable(true);
 
         buildButton.setDisable(false);
         cancelBuildButton.setVisible(true);
@@ -219,6 +226,7 @@ public class MainGameController {
         diceRollButton.setDisable(true);
         buyDevelopmentCardButton.setDisable(true);
         tradeButton.setDisable(true);
+        selfTradeButton.setDisable(true);
         buildButton.setDisable(true);
         cancelBuildButton.setVisible(false);
         break;
@@ -326,6 +334,36 @@ public class MainGameController {
     }
   }
 
+  @FXML
+  private void tradeWithSelf() {
+    setUpFrontdrop();
+    setButtonState(ButtonState.MODAL);
+    new SelfTradeWindow(this);
+  }
+
+  public void continueHandlingTradingWithSelf(
+    ResourceCard necessaryResource,
+    ResourceCard requestedResource
+  ) {
+    Player currentPlayer = Players.getCurrentPlayer();
+
+    int necessaryCount = 4;
+    int requestedCount = 1;
+
+    ResourceCardMap resourceHand = currentPlayer.getResourceHand();
+    resourceHand.remove(necessaryResource, necessaryCount);
+    resourceHand.add(requestedResource, requestedCount);
+
+    tearDownFrontdrop();
+    loadCardsFor(currentPlayer);
+    setButtonState(ButtonState.DEFAULT);
+  }
+
+  public void continueHandlingTradingWithSelf() {
+    tearDownFrontdrop();
+    setButtonState(ButtonState.DEFAULT);
+  }
+
   private void tryTradingWithPort(PortSlot portSlot) {
     Player currentPlayer = Players.getCurrentPlayer();
     boolean canTrade = false;
@@ -354,14 +392,14 @@ public class MainGameController {
   ) {
     Player currentPlayer = Players.getCurrentPlayer();
 
-    tearDownFrontdrop();
-
     int necessaryCount = portKind.getPortNecessaryCount();
     int requestedCount = portKind.getPortRequestedCount();
 
     ResourceCardMap resourceHand = currentPlayer.getResourceHand();
     resourceHand.remove(necessaryResource, necessaryCount);
     resourceHand.add(requestedResource, requestedCount);
+
+    tearDownFrontdrop();
     loadCardsFor(currentPlayer);
     setButtonState(ButtonState.DEFAULT);
   }
