@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import venusians.data.cards.HasCard;
 import venusians.gui.ChangeListenerBuilder;
 import venusians.gui.main.artists.CardArtist;
@@ -12,7 +13,7 @@ import venusians.gui.main.artists.CardArtist;
 public class CardUpdater<C extends HasCard> {
 
   private Collection<C> currentCards;
-  private HashMap<C, Node> cardRenderMap = new HashMap<>();
+  private HashMap<C, StackPane> cardRenderMap = new HashMap<>();
   private Pane parentPane;
 
   public CardUpdater(Pane parentPane) {
@@ -30,7 +31,7 @@ public class CardUpdater<C extends HasCard> {
     paneChildren.clear();
     cardRenderMap.clear();
     for (C card : currentCards) {
-      Node render = CardArtist.render(card);
+      StackPane render = CardArtist.render(card);
       cardRenderMap.put(card, render);
       paneChildren.add(render);
     }
@@ -66,11 +67,18 @@ public class CardUpdater<C extends HasCard> {
     for (int i = 0; i < children.size(); i++) {
       Node child = children.get(i);
       double offset = offsetPerCard * (i - offsetHalf) + middleOffset;
-      child.setLayoutX(offset);
+      if (child instanceof StackPane) {
+        StackPane stackPane = (StackPane) child;
+        stackPane
+          .layoutXProperty()
+          .bind(stackPane.widthProperty().negate().divide(2).add(offset));
+      } else {
+        child.setLayoutX(offset);
+      }
     }
   }
 
-  public Node getRenderForCard(C card) {
+  public StackPane getRenderForCard(C card) {
     return cardRenderMap.get(card);
   }
 }

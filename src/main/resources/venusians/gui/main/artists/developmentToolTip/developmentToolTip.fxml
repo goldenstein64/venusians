@@ -6,10 +6,10 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="rootPane" prefHeight="50.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="venusians.gui.main.artists.developmentToolTip.DevelopmentToolTipController">
+<AnchorPane fx:id="rootPane" prefHeight="50.0" prefWidth="150.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="venusians.gui.main.artists.developmentToolTip.DevelopmentToolTipController">
    <children>
       <Rectangle arcHeight="5.0" arcWidth="5.0" height="${rootPane.height}" layoutY="-60.0" opacity="0.5" stroke="BLACK" strokeType="INSIDE" width="${rootPane.width}" />
-      <VBox alignment="CENTER" layoutY="-60.0" prefHeight="50.0" prefWidth="200.0">
+      <VBox alignment="CENTER" layoutY="-60.0" prefHeight="${rootPane.height}" prefWidth="${rootPane.width}">
          <children>
             <Label fx:id="nameLabel" text="Knight" textFill="WHITE">
                <font>
