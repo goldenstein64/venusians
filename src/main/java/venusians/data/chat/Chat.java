@@ -1,21 +1,35 @@
 package venusians.data.chat;
 
-import java.util.Queue;
-import venusians.util.Event;
+import java.util.ArrayDeque;
+import javafx.event.EventHandler;
 
-public class Chat {
+public final class Chat {
+
+  private Chat() {}
 
   private static final int MESSAGE_LIMIT = 20;
 
-  private static Queue<Message> messages;
+  private static ArrayDeque<Message> messages = new ArrayDeque<>();
 
-  public static final Event<Message> chatted = new Event<Message>();
+  private static EventHandler<MessageEvent> onChatted;
 
   public static void add(Message message) {
     messages.add(message);
     if (messages.size() > MESSAGE_LIMIT) {
       messages.remove();
     }
-    chatted.fire(message);
+
+    MessageEvent messageEvent = new MessageEvent(message);
+    if (onChatted != null) {
+      onChatted.handle(messageEvent);
+    }
+  }
+
+  public static void setOnChatted(EventHandler<MessageEvent> onChatted) {
+    Chat.onChatted = onChatted;
+  }
+
+  public static EventHandler<MessageEvent> getOnChatted() {
+    return onChatted;
   }
 }

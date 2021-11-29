@@ -1,14 +1,12 @@
 package venusians.data.chat;
 
-import venusians.data.players.Player;
-
 public class Message {
 
-  public Player author;
-  public String text;
+  public HasName author;
+  public String content;
 
-  public Message(Player author, String text) {
+  public Message(HasName author, String content) {
     this.author = author;
-    this.text = text;
+    this.content = content;
   }
 }
