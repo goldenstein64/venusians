@@ -75,7 +75,12 @@ public class Point {
     return new IntPoint((int) Math.round(this.x), (int) Math.round(this.y));
   }
 
+  public boolean isIdentity() {
+    return x == 0 && y == 0;
+  }
+
+  @Override
   public String toString() {
-    return String.format("(%.2f, %.2f)", this.x, this.y);
+    return String.format("(%.3f, %.3f)", this.x, this.y);
   }
 }

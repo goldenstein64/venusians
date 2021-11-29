@@ -6,7 +6,7 @@ import venusians.data.board.tiles.TileKind;
 import venusians.data.cards.HasCard;
 import venusians.util.Images;
 
-public enum ResourceCard implements TileKind, PortKind, HasCard {
+public enum ResourceCard implements HasCard, TileKind, PortKind {
   WOOD("woodCard.png", "woodTile.png", "woodPort.png"),
   WOOL("woolCard.png", "woolTile.png", "woolPort.png"),
   WHEAT("wheatCard.png", "wheatTile.png", "wheatPort.png"),
@@ -39,14 +39,18 @@ public enum ResourceCard implements TileKind, PortKind, HasCard {
       case 4:
         return BRICK;
       default:
-        throw new IllegalArgumentException(String.format("Value (%d) is invalid", value));
+        throw new IllegalArgumentException(
+          String.format("Value (%d) is invalid", value)
+        );
     }
   }
 
+  @Override
   public Image getCardImage() {
     return cardImage;
   }
 
+  @Override
   public Image getTileImage() {
     return tileImage;
   }
@@ -55,10 +59,12 @@ public enum ResourceCard implements TileKind, PortKind, HasCard {
     return portImage;
   }
 
+  @Override
   public int getPortNecessaryCount() {
     return portNecessaryCount;
   }
 
+  @Override
   public int getPortRequestedCount() {
     return portRequestedCount;
   }

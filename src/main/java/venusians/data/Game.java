@@ -1,6 +1,9 @@
 package venusians.data;
 
 import venusians.data.board.Board;
+import venusians.data.cards.development.DevelopmentCard;
+import venusians.data.cards.special.LargestArmyCard;
+import venusians.data.cards.special.LongestRoadCard;
 import venusians.data.lifecycle.GameOptions;
 import venusians.data.lifecycle.GameResults;
 import venusians.data.players.Players;
@@ -8,7 +11,9 @@ import venusians.data.players.Players;
 /**
  * Class responsible for implementing game logic
  */
-public class Game {
+public final class Game {
+
+  private Game() {}
 
   private static GameOptions gameOptions = new GameOptions();
   private static GameResults gameResults = new GameResults();
@@ -38,6 +43,9 @@ public class Game {
   public static void startGame() {
     Players.startGame();
     Board.startGame();
+    DevelopmentCard.startGame();
+    LargestArmyCard.startGame();
+    LongestRoadCard.startGame();
   }
 
   /**

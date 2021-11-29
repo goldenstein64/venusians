@@ -8,7 +8,10 @@ public class KnightCard extends DevelopmentCard {
 
   private static final String name = "Knight";
   private static final String description = "Move the Robber.";
-  private static final Image cardImage = Images.load(KnightCard.class, "knightChip.png");
+  private static final Image cardImage = Images.load(
+    KnightCard.class,
+    "knightChip.png"
+  );
 
   public KnightCard(Player owner) {
     super(owner);
@@ -27,11 +30,5 @@ public class KnightCard extends DevelopmentCard {
   @Override
   public Image getCardImage() {
     return cardImage;
-  }
-
-  @Override
-  public void apply() {
-    // choose a place to move the robber.
-    // if the robber lands next to a settlement, choose one and steal a resource from its owner.
   }
 }

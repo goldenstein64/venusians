@@ -1,7 +1,6 @@
 package venusians.data.board.buildable;
 
 import java.util.Map.Entry;
-
 import javafx.scene.image.Image;
 import venusians.data.board.IntPoint;
 import venusians.data.cards.resource.ResourceCard;
@@ -19,12 +18,13 @@ public class City extends Building {
     BLUEPRINT.put(ResourceCard.WHEAT, 2);
   }
 
-  public static ResourceCardMap getBlueprint() {
-    return BLUEPRINT;
-  }
-
   public City(Player owner, IntPoint position) {
     super(owner, position);
+  }
+
+  @Override
+  public ResourceCardMap getBlueprint() {
+    return BLUEPRINT;
   }
 
   @Override
@@ -32,9 +32,11 @@ public class City extends Building {
     return multiplyResourceCardMapByTwo(super.getResources());
   }
 
-  private ResourceCardMap multiplyResourceCardMapByTwo(ResourceCardMap cardMap) {
+  private ResourceCardMap multiplyResourceCardMapByTwo(
+    ResourceCardMap cardMap
+  ) {
     for (Entry<ResourceCard, Integer> entry : cardMap.entrySet()) {
-      cardMap.put(entry.getKey(), 2 * entry.getValue());
+      entry.setValue(2 * entry.getValue());
     }
     return cardMap;
   }

@@ -36,7 +36,7 @@ public class DiceRoll {
 
   /**
    * Rolls a number of dice and returns the result.
-   * 
+   *
    * @param valueCount The number of dice to roll.
    */
   public DiceRoll(int valueCount) {
@@ -51,7 +51,7 @@ public class DiceRoll {
 
   /**
    * Retrieves a dice image based on the value rolled.
-   * 
+   *
    * @param value The value that was rolled.
    * @return The image associated with this value.
    */

@@ -4,25 +4,28 @@ import javafx.scene.image.Image;
 import venusians.util.Images;
 
 public enum AnyPort implements PortKind {
-	INSTANCE;
+  INSTANCE;
 
-	private Image portImage = Images.load(AnyPort.class, "anyPort.png");
-	private int portNecessaryCount = 3;
-	private int portRequestedCount = 1;
+  private Image portImage = Images.load(AnyPort.class, "anyPort.png");
+  private int portNecessaryCount = 3;
+  private int portRequestedCount = 1;
 
-	public static AnyPort getInstance() {
-		return INSTANCE;
-	}
-	
-	public Image getPortImage() {
-		return portImage;
-	}
+  public static AnyPort getInstance() {
+    return INSTANCE;
+  }
 
-	public int getPortNecessaryCount() {
-		return portNecessaryCount;
-	}
+  @Override
+  public Image getPortImage() {
+    return portImage;
+  }
 
-	public int getPortRequestedCount() {
-		return portRequestedCount;
-	}
+  @Override
+  public int getPortNecessaryCount() {
+    return portNecessaryCount;
+  }
+
+  @Override
+  public int getPortRequestedCount() {
+    return portRequestedCount;
+  }
 }

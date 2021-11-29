@@ -1,81 +1,502 @@
 package venusians.gui.main;
 
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
-
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map.Entry;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
 import venusians.data.Game;
 import venusians.data.board.Board;
+import venusians.data.board.IntPoint;
 import venusians.data.board.Point;
 import venusians.data.board.buildable.Building;
-import venusians.data.board.buildable.City;
-import venusians.data.board.buildable.Settlement;
 import venusians.data.board.tiles.MapSlot;
+import venusians.data.board.tiles.PortKind;
 import venusians.data.board.tiles.PortSlot;
 import venusians.data.board.tiles.TileSlot;
-import venusians.data.cards.HasCard;
+import venusians.data.cards.TradeRequest;
+import venusians.data.cards.development.DevelopmentCard;
 import venusians.data.cards.development.DevelopmentCardList;
+import venusians.data.cards.development.KnightCard;
+import venusians.data.cards.development.MonopolyCard;
+import venusians.data.cards.development.RoadBuildingCard;
+import venusians.data.cards.development.VictoryPointCard;
+import venusians.data.cards.development.YearOfPlentyCard;
 import venusians.data.cards.resource.ResourceCard;
-import venusians.data.cards.resource.ResourceCardList;
+import venusians.data.cards.resource.ResourceCardMap;
+import venusians.data.cards.special.LargestArmyCard;
+import venusians.data.cards.special.LongestRoadCard;
+import venusians.data.chat.Chat;
+import venusians.data.chat.Message;
+import venusians.data.chat.TradeOfferMessage;
 import venusians.data.players.Player;
 import venusians.data.players.Players;
 import venusians.gui.App;
 import venusians.gui.ChangeListenerBuilder;
-import venusians.util.Images;
+import venusians.gui.main.artists.PortSlotArtist;
+import venusians.gui.main.artists.RobberArtist;
+import venusians.gui.main.artists.TileSlotArtist;
+import venusians.gui.main.artists.resourceChoice.ResourceChoiceArtist;
+import venusians.gui.main.artists.resourceChoice.ResourceChoiceController;
+import venusians.gui.main.artists.resourceMultiChoice.ResourceMultiChoiceController;
+import venusians.gui.main.artists.tradeRequest.TradeRequestArtist;
+import venusians.gui.main.artists.tradeRequest.TradeRequestController;
+import venusians.gui.main.subControllers.BuildController;
+import venusians.gui.main.subControllers.RoadBuildingController;
+import venusians.gui.main.subControllers.RobberPlacementController;
+import venusians.gui.main.subControllers.StartBuildController;
+import venusians.gui.main.updaters.BuildingPaneUpdater;
+import venusians.gui.main.updaters.CardUpdater;
+import venusians.gui.main.updaters.ChatUpdater;
+import venusians.gui.main.updaters.RoadPaneUpdater;
+import venusians.gui.main.windows.DicePaneWindow;
+import venusians.gui.main.windows.PortTradeWindow;
+import venusians.gui.main.windows.ResourceAdditionWindow;
+import venusians.gui.main.windows.ResourceRemovalWindow;
+import venusians.gui.main.windows.TradeWindow;
 
 public class MainGameController {
 
+  private SecureRandom rng = new SecureRandom();
+
+  @FXML
+  private Rectangle backdrop;
+
+  @FXML
+  private AnchorPane mapPane;
+
+  @FXML
+  private AnchorPane roadPane;
+
+  @FXML
+  private AnchorPane buildingPane;
+
+  @FXML
+  private Label currentPlayerLabel;
+
+  @FXML
+  private Label victoryPointsValueLabel;
+
+  @FXML
+  private TextField chatPrompt;
+
+  @FXML
+  private VBox chatHistory;
+
+  @FXML
+  private Pane developmentPane;
+
+  @FXML
+  private Pane resourcePane;
+
+  @FXML
+  private StackPane mainViewPane;
+
+  @FXML
+  private ScrollPane chatScrollPane;
+
+  @FXML
+  private Button diceRollButton;
+
+  @FXML
+  private Button buildButton;
+
+  @FXML
+  private Button cancelBuildButton;
+
+  @FXML
+  private Button buyDevelopmentCardButton;
+
+  @FXML
+  private Button tradeButton;
+
+  @FXML
+  private Label rollResultLabel;
+
+  @FXML
+  private Button endTurnButton;
+
+  @FXML
+  private ImageView largestArmyImage;
+
+  @FXML
+  private ImageView longestRoadImage;
+
+  private ImageView robberImage;
+
   public static final double TILE_ASPECT_RATIO = Math.sqrt(3) / 2;
 
-  private static final int HISTORY_RANGE = 20;
+  public static final Color BUILD_MODE_COLOR = new Color(
+    191 / 255.0,
+    191 / 255.0,
+    191 / 255.0,
+    1
+  );
+
+  public static final Color ROBBER_PLACEMENT_COLOR = new Color(
+    255 / 255.0,
+    186 / 255.0,
+    186 / 255.0,
+    1
+  );
+
   public static final double TILE_SIZE = 100;
   public static final double BUILDING_SIZE = 35;
 
-  private boolean shouldSnapVvalue = false;
+  private BuildController currentBuildController;
+  private Node currentTradeWindowRender;
+  private BuildingPaneUpdater buildingPaneUpdater;
+  private RoadPaneUpdater roadPaneUpdater;
+  private CardUpdater<DevelopmentCard> developmentCardUpdater;
+  private CardUpdater<ResourceCard> resourceCardUpdater;
+  private ChatUpdater chatUpdater;
+  private Rectangle frontdrop;
 
-  private Image portConnectorImage = Images.load(MainGameController.class, "portConnector.png");
+  private ButtonState currentButtonState = ButtonState.BUILD;
 
-  private BuildModeController currentBuildModeController;
-  private BuildableRenderer buildableRenderer;
-
-  private enum GameState {
-    DEFAULT, BUILD;
+  private enum ButtonState {
+    STARTING,
+    DEFAULT,
+    BUILD,
+    BUILD_COUNTABLE,
+    MODAL,
   }
 
-  private GameState gameState = GameState.DEFAULT;
-  private Rectangle buildModeBackdrop;
+  private void setButtonState(ButtonState newButtonState) {
+    currentButtonState = newButtonState;
+    switch (currentButtonState) {
+      case STARTING:
+        unbindMouse();
+        endTurnButton.setDisable(true);
+        buildButton.setDisable(true);
+        cancelBuildButton.setVisible(false);
+        buyDevelopmentCardButton.setDisable(true);
+        tradeButton.setDisable(true);
 
-  @FXML private AnchorPane mapPane;
-  @FXML private Label victoryPointsValueLabel;
-  @FXML private TextField chatPrompt;
-  @FXML private VBox chatHistory;
-  @FXML private Pane developmentPane;
-  @FXML private Pane resourcePane;
-  @FXML private StackPane mainViewPane;
-  @FXML private ScrollPane chatScrollPane;
-  @FXML private Button diceRollButton;
-  @FXML private Button buildButton;
-  @FXML private Button tradeButton;
-  @FXML private Label rollResultLabel;
-  @FXML private Button endTurnButton;
+        diceRollButton.setDisable(false);
+        break;
+      case DEFAULT:
+        bindMouse();
+        diceRollButton.setDisable(true);
+        cancelBuildButton.setVisible(false);
+
+        endTurnButton.setDisable(false);
+        buildButton.setDisable(false);
+        buyDevelopmentCardButton.setDisable(false);
+        tradeButton.setDisable(false);
+        break;
+      case BUILD:
+        unbindMouse();
+        endTurnButton.setDisable(true);
+        diceRollButton.setDisable(true);
+        buyDevelopmentCardButton.setDisable(true);
+        tradeButton.setDisable(true);
+
+        buildButton.setDisable(false);
+        cancelBuildButton.setVisible(true);
+        break;
+      case BUILD_COUNTABLE:
+      case MODAL:
+        unbindMouse();
+        endTurnButton.setDisable(true);
+        diceRollButton.setDisable(true);
+        buyDevelopmentCardButton.setDisable(true);
+        tradeButton.setDisable(true);
+        buildButton.setDisable(true);
+        cancelBuildButton.setVisible(false);
+        break;
+      default:
+        throw new RuntimeException(
+          String.format(
+            "Unknown button state (%s)",
+            currentButtonState != null ? currentButtonState.name() : "null"
+          )
+        );
+    }
+  }
+
+  /**
+   * Describes what happens when the controller is set up for the first time.
+   */
+  @FXML
+  private void initialize() {
+    buildingPaneUpdater = new BuildingPaneUpdater(buildingPane);
+    roadPaneUpdater = new RoadPaneUpdater(roadPane);
+    developmentCardUpdater = new CardUpdater<>(developmentPane);
+    resourceCardUpdater = new CardUpdater<>(resourcePane);
+    chatUpdater = new ChatUpdater(chatHistory, chatScrollPane, chatPrompt);
+
+    Game.startGame();
+
+    renderMap();
+    renderRobber();
+
+    initializePlayers();
+    chatUpdater.bindSnapToBottom();
+
+    setButtonState(ButtonState.DEFAULT);
+    loadInterfaceFor(Players.getCurrentPlayer());
+    placeStartingSettlements();
+  }
+
+  private void bindMouse() {
+    mainViewPane.setOnMouseClicked(this::onMouseClicked);
+  }
+
+  private void unbindMouse() {
+    mainViewPane.setOnMouseClicked(null);
+  }
+
+  private void onMouseClicked(MouseEvent event) {
+    Point mousePosition = new Point(event.getX(), event.getY());
+    IntPoint slotPosition = HexTransform.guiToHexSlot(mousePosition);
+
+    MapSlot slot = Board.getSlotAt(slotPosition);
+    if (slot instanceof PortSlot) {
+      PortSlot portSlot = (PortSlot) slot;
+      tryTradingWithPort(portSlot);
+    }
+  }
+
+  public void addDebugResources() {
+    for (Player player : Players.getPlayers()) {
+      ResourceCardMap resourceHand = player.getResourceHand();
+      for (ResourceCard card : ResourceCard.values()) {
+        resourceHand.add(card, 5);
+      }
+
+      for (int i = 0; i < 5; i++) {
+        resourceHand.add(DevelopmentCard.BLUEPRINT);
+        player.pickDevelopmentCard();
+      }
+    }
+  }
+
+  private void placeStartingSettlements() {
+    setButtonState(ButtonState.BUILD_COUNTABLE);
+    backdrop.setFill(BUILD_MODE_COLOR);
+
+    StartBuildController controller = new StartBuildController(this);
+    controller.bindMouse();
+  }
+
+  public void finishPlacingStartingSettlements() {
+    backdrop.setFill(Color.WHITE);
+
+    for (Building building : Board.getBuildings()) {
+      ResourceCardMap resources = building.getResources();
+      building.getOwner().getResourceHand().add(resources);
+    }
+
+    loadCardsFor(Players.getCurrentPlayer());
+    setButtonState(ButtonState.STARTING);
+  }
+
+  private void renderMap() {
+    for (MapSlot mapSlot : Board.getMap()) {
+      if (mapSlot == null) continue;
+
+      StackPane slotPane;
+      if (mapSlot instanceof TileSlot) {
+        slotPane = TileSlotArtist.render((TileSlot) mapSlot);
+      } else if (mapSlot instanceof PortSlot) {
+        slotPane = PortSlotArtist.render((PortSlot) mapSlot);
+      } else {
+        throw new RuntimeException("MapSlot kind not found");
+      }
+
+      mapPane.getChildren().add(slotPane);
+    }
+  }
+
+  private void tryTradingWithPort(PortSlot portSlot) {
+    Player currentPlayer = Players.getCurrentPlayer();
+    boolean canTrade = false;
+    for (Building building : Board.getBuildingsAtPort(portSlot)) {
+      if (building.getOwner() == currentPlayer) {
+        canTrade = true;
+        break;
+      }
+    }
+
+    if (canTrade) {
+      tradeWithPort(portSlot);
+    }
+  }
+
+  private void tradeWithPort(PortSlot portSlot) {
+    setUpFrontdrop();
+    setButtonState(ButtonState.MODAL);
+    new PortTradeWindow(this, portSlot.kind);
+  }
+
+  public void continueHandlingTradingWithPort(
+    PortKind portKind,
+    ResourceCard necessaryResource,
+    ResourceCard requestedResource
+  ) {
+    Player currentPlayer = Players.getCurrentPlayer();
+
+    tearDownFrontdrop();
+
+    int necessaryCount = portKind.getPortNecessaryCount();
+    int requestedCount = portKind.getPortRequestedCount();
+
+    ResourceCardMap resourceHand = currentPlayer.getResourceHand();
+    resourceHand.remove(necessaryResource, necessaryCount);
+    resourceHand.add(requestedResource, requestedCount);
+    loadCardsFor(currentPlayer);
+    setButtonState(ButtonState.DEFAULT);
+  }
+
+  public void continueHandlingTradingWithPort() {
+    tearDownFrontdrop();
+    setButtonState(ButtonState.DEFAULT);
+  }
+
+  private void renderRobber() {
+    if (robberImage == null) {
+      robberImage = RobberArtist.render(Board.getRobberPosition());
+      mapPane.getChildren().add(robberImage);
+    } else {
+      RobberArtist.reRender(robberImage, Board.getRobberPosition());
+    }
+  }
+
+  private void initializePlayers() {
+    Players.currentPlayerProperty().addListener(playerChangedListener);
+
+    Player currentPlayer = Players.getCurrentPlayer();
+    victoryPointsValueLabel
+      .textProperty()
+      .bind(currentPlayer.victoryPointsProperty().asString());
+  }
+
+  private ChangeListener<Player> playerChangedListener = ChangeListenerBuilder.from(
+    this::onPlayerChanged
+  );
+
+  private void loadInterfaceFor(Player player) {
+    currentPlayerLabel.setText(String.format("%s's Turn", player.getName()));
+    largestArmyImage.setOpacity(
+      LargestArmyCard.getCardOwner() == player ? 1 : 0.3
+    );
+    longestRoadImage.setOpacity(
+      LongestRoadCard.getCardOwner() == player ? 1 : 0.3
+    );
+
+    loadCardsFor(player);
+  }
+
+  private void loadCardsFor(Player player) {
+    DevelopmentCardList developmentHand = player.getDevelopmentHand();
+    developmentCardUpdater.update(developmentHand);
+    resourceCardUpdater.update(player.getResourceHand().toList());
+
+    for (DevelopmentCard card : developmentHand) {
+      Node render = developmentCardUpdater.getRenderForCard(card);
+      render.setOnMouseClicked(event -> onDevelopmentCardClicked(card));
+    }
+  }
+
+  private void onDevelopmentCardClicked(DevelopmentCard card) {
+    Player cardOwner = card.getOwner();
+
+    if (card instanceof KnightCard) {
+      moveRobber();
+    } else if (card instanceof MonopolyCard) {
+      ResourceChoiceController choiceController = ResourceChoiceArtist.render();
+      choiceController
+        .getCaptionLabel()
+        .setText("Please choose a resource to monopolize.");
+      for (Entry<ResourceCard, ImageView> entry : choiceController
+        .getButtonMap()
+        .entrySet()) {
+        ResourceCard chosenCard = entry.getKey();
+        ImageView button = entry.getValue();
+
+        button.setOnMouseClicked(
+          event -> {
+            mainViewPane.getChildren().remove(choiceController.getRootPane());
+            tearDownFrontdrop();
+            continueHandlingMonopolyCard(cardOwner, chosenCard);
+          }
+        );
+      }
+
+      setButtonState(ButtonState.MODAL);
+      setUpFrontdrop();
+      mainViewPane.getChildren().add(choiceController.getRootPane());
+    } else if (card instanceof RoadBuildingCard) {
+      backdrop.setFill(BUILD_MODE_COLOR);
+      RoadBuildingController controller = new RoadBuildingController(this);
+      setButtonState(ButtonState.BUILD_COUNTABLE);
+      controller.bindMouse();
+    } else if (card instanceof YearOfPlentyCard) {
+      setButtonState(ButtonState.MODAL);
+      setUpFrontdrop();
+      ResourceAdditionWindow window = new ResourceAdditionWindow(this, 2);
+      mainViewPane.getChildren().add(window.getController().getRootPane());
+    } else if (card instanceof VictoryPointCard) {
+      return;
+    }
+
+    cardOwner.useDevelopmentCard(card);
+    if (Players.getCurrentPlayer() == cardOwner) {
+      loadInterfaceFor(cardOwner);
+    }
+  }
+
+  private void continueHandlingMonopolyCard(
+    Player owner,
+    ResourceCard chosenCard
+  ) {
+    ArrayList<Player> otherPlayers = new ArrayList<>(
+      Arrays.asList(Players.getPlayers())
+    );
+    otherPlayers.remove(owner);
+
+    ResourceCardMap ownerResourceHand = owner.getResourceHand();
+    for (Player player : otherPlayers) {
+      ResourceCardMap resourceHand = player.getResourceHand();
+      int cardsTaken = Math.min(resourceHand.get(chosenCard), 2);
+
+      resourceHand.remove(chosenCard, cardsTaken);
+      ownerResourceHand.add(chosenCard, cardsTaken);
+    }
+
+    loadCardsFor(Players.getCurrentPlayer());
+    setButtonState(ButtonState.DEFAULT);
+  }
+
+  public void continueHandlingRoadBuildingCard() {
+    backdrop.setFill(Color.WHITE);
+    setButtonState(ButtonState.DEFAULT);
+  }
+
+  public void continueHandlingYearOfPlentyCard(ResourceAdditionWindow window) {
+    mainViewPane.getChildren().remove(window.getController().getRootPane());
+    tearDownFrontdrop();
+    loadCardsFor(Players.getCurrentPlayer());
+    setButtonState(ButtonState.DEFAULT);
+  }
 
   @FXML
   private void endGame() throws IOException {
@@ -85,305 +506,360 @@ public class MainGameController {
   @FXML
   private void endTurn() {
     Players.nextTurn();
-    // reload the interface?
+    setButtonState(ButtonState.STARTING);
   }
 
   @FXML
   private void toggleBuildMode() {
-    if (gameState == GameState.BUILD) {
-      gameState = GameState.DEFAULT;
-      exitBuildMode();
-      currentBuildModeController = null;
-    } else {
-      gameState = GameState.BUILD;
-      currentBuildModeController = new BuildModeController(mapPane, buildableRenderer);
-      enterBuildMode();
+    setButtonState(
+      currentButtonState == ButtonState.BUILD
+        ? ButtonState.DEFAULT
+        : ButtonState.BUILD
+    );
+    switch (currentButtonState) {
+      case BUILD:
+        enterBuildMode();
+        break;
+      default:
+        exitBuildModeAndApplySuggestions();
+        break;
     }
   }
 
   private void enterBuildMode() {
+    currentBuildController = new BuildController(this);
     buildButton.setText("Finish Building");
-    tradeButton.setDisable(true);
 
-    // make the interface look like it's in build mode using a backdrop
-    buildModeBackdrop = new Rectangle();
-    buildModeBackdrop.setFill(new Color(255 / 255.0, 143 / 255.0, 135 / 255.0, 1));
-    buildModeBackdrop.widthProperty().bind(mainViewPane.widthProperty());
-    buildModeBackdrop.heightProperty().bind(mainViewPane.heightProperty());
+    backdrop.setFill(BUILD_MODE_COLOR);
 
-    mainViewPane.getChildren().add(0, buildModeBackdrop);
-
-    mainViewPane.setOnMousePressed(currentBuildModeController::onMousePressed);
-    mainViewPane.setOnMouseDragged(currentBuildModeController::onMouseDragged);
-    mainViewPane.setOnMouseReleased(currentBuildModeController::onMouseReleased);
+    currentBuildController.bindMouse();
   }
 
-  private void exitBuildMode() {
+  private void exitBuildModeAndApplySuggestions() {
+    exitBuildModeWithoutCleanup();
+    currentBuildController.applySuggestions();
+    currentBuildController = null;
+    loadInterfaceFor(Players.getCurrentPlayer());
+  }
+
+  @FXML
+  private void cancelBuildMode() {
+    exitBuildModeWithoutCleanup();
+    setButtonState(ButtonState.DEFAULT);
+    currentBuildController.discardSuggestions();
+    currentBuildController = null;
+  }
+
+  private void exitBuildModeWithoutCleanup() {
     buildButton.setText("Build");
-    tradeButton.setDisable(false);
 
-    // assuming the backdrop is still in the back of the mainViewPane's children,
-    if (buildModeBackdrop != null) {
-      mainViewPane.getChildren().remove(buildModeBackdrop);
-      buildModeBackdrop = null;
+    backdrop.setFill(Color.WHITE);
+
+    currentBuildController.unbindMouse();
+  }
+
+  @FXML
+  private void createTradeDraft() {
+    TradeWindow tradeWindow = new TradeWindow();
+    setUpTradeWindow(tradeWindow);
+  }
+
+  private void createTradeDraft(TradeRequest offer) {
+    TradeWindow tradeWindow = new TradeWindow(offer);
+    setUpTradeWindow(tradeWindow);
+  }
+
+  private void setUpTradeWindow(TradeWindow tradeWindow) {
+    setButtonState(ButtonState.MODAL);
+
+    tradeWindow.setOnOfferCreated(this::onOfferCreated);
+    tradeWindow.setOnOfferDiscarded(this::tearDownTradeWindow);
+
+    setUpFrontdrop();
+
+    currentTradeWindowRender = tradeWindow.getRender();
+    mainViewPane.getChildren().add(currentTradeWindowRender);
+  }
+
+  private void setUpFrontdrop() {
+    frontdrop = new Rectangle();
+    frontdrop.setFill(Color.BLACK);
+    frontdrop.setOpacity(0.75);
+    frontdrop.widthProperty().bind(mainViewPane.widthProperty());
+    frontdrop.heightProperty().bind(mainViewPane.heightProperty());
+    mainViewPane.getChildren().add(frontdrop);
+  }
+
+  private void tearDownTradeWindow() {
+    List<Node> mainViewChildren = mainViewPane.getChildren();
+
+    tearDownFrontdrop();
+
+    if (currentTradeWindowRender != null) {
+      mainViewChildren.remove(currentTradeWindowRender);
+      currentTradeWindowRender = null;
     }
+    setButtonState(ButtonState.DEFAULT);
+  }
 
-    mainViewPane.setOnMousePressed(null);
-    mainViewPane.setOnMouseDragged(null);
-    mainViewPane.setOnMouseReleased(null);
+  private void tearDownFrontdrop() {
+    if (frontdrop != null) {
+      mainViewPane.getChildren().remove(frontdrop);
+      frontdrop = null;
+    }
+  }
 
-    currentBuildModeController.applySuggestions();
+  private void onOfferCreated(TradeRequest offer) {
+    tearDownTradeWindow();
+
+    TradeOfferMessage message = new TradeOfferMessage(
+      Players.getCurrentPlayer()
+    );
+
+    Chat.add(message);
+    Node messageRender = chatUpdater.getLastMessageRendered();
+    messageRender.setOnMouseClicked(
+      event -> {
+        setButtonState(ButtonState.MODAL);
+        TradeRequestController offerController = TradeRequestArtist.render(
+          offer
+        );
+        setUpFrontdrop();
+        StackPane offerPane = offerController.getRootPane();
+        mainViewPane.getChildren().add(offerPane);
+        offerController.setOnAcceptOffer(
+          (TradeRequest eventOffer) -> {
+            mainViewPane.getChildren().remove(offerPane);
+            tearDownFrontdrop();
+            setButtonState(ButtonState.DEFAULT);
+            acceptTradeRequest(eventOffer);
+            messageRender.setDisable(true);
+            messageRender.setOnMouseClicked(null);
+          }
+        );
+        offerController.setOnModifyOffer(
+          (TradeRequest eventOffer) -> {
+            mainViewPane.getChildren().remove(offerPane);
+            tearDownFrontdrop();
+            setButtonState(ButtonState.DEFAULT);
+            createTradeDraft(eventOffer);
+          }
+        );
+        offerController.setOnCancelOffer(
+          (TradeRequest eventOffer) -> {
+            mainViewPane.getChildren().remove(offerPane);
+            tearDownFrontdrop();
+            setButtonState(ButtonState.DEFAULT);
+          }
+        );
+      }
+    );
+  }
+
+  private void acceptTradeRequest(TradeRequest offer) {
+    Player customer = Players.getCurrentPlayer();
+    Player merchant = offer.merchant;
+
+    merchant.tradeWith(customer, offer);
+    resourceCardUpdater.update();
   }
 
   @FXML
   private void sayMessage() {
-    String message = chatPrompt.getText();
-    if (message.isEmpty()) return;
+    String messageContent = chatPrompt.getText();
+    if (messageContent.isEmpty()) return;
 
-    String authorName = Players.getCurrentPlayer().getName();
-    String messageContent = String.format("[%s]: %s", authorName, message);
-
-    ObservableList<Node> chatChildren = chatHistory.getChildren();
-
-    Label messageLabel = new Label(messageContent);
-    chatChildren.add(messageLabel);
-    if (chatChildren.size() > HISTORY_RANGE) chatChildren.remove(0);
-
-    chatPrompt.setText("");
-    if (chatScrollPane.getVvalue() == 1.0) {
-      shouldSnapVvalue = true;
-    }
+    Message message = new Message(Players.getCurrentPlayer(), messageContent);
+    Chat.add(message);
   }
 
   @FXML
   private void rollDice() {
-    DicePaneComponent.rollDice(mainViewPane, this::onDicePaneExited);
+    setButtonState(ButtonState.MODAL);
+    DicePaneWindow.rollDice(mainViewPane, this::onDicePaneExited);
   }
-  
-  public void onDicePaneExited(int rollValue) {
-    // display number
+
+  private void onDicePaneExited(int rollValue) {
     rollResultLabel.setText(String.valueOf(rollValue));
 
-    TileSlot[] tileSlots = Board.getTileSlotsForRollValue(rollValue);
+    if (rollValue == 7) {
+      handleSevenRollBeforeRemovingResources();
+    } else {
+      gatherResourcesForRollValue(rollValue);
+      setButtonState(ButtonState.DEFAULT);
+    }
+  }
 
-    for (TileSlot slot : tileSlots) {
-      if (!(slot.kind instanceof ResourceCard))
-        continue;
-
-      ResourceCard resourceCard = (ResourceCard) slot.kind;
-
-      for (Building building : Board.getBuildingsForTileSlot(slot)) {
-        building.getOwner().receiveResource(resourceCard);
+  private void handleSevenRollBeforeRemovingResources() {
+    ArrayList<Player> victims = new ArrayList<>();
+    for (Player player : Players.getPlayers()) {
+      if (player.getResourceHand().size() > 7) {
+        victims.add(player);
       }
     }
+
+    if (!victims.isEmpty()) {
+      ResourceRemovalWindow window = new ResourceRemovalWindow(this, victims);
+
+      ResourceMultiChoiceController controller = window.getController();
+
+      setButtonState(ButtonState.MODAL);
+      setUpFrontdrop();
+      mainViewPane.getChildren().add(controller.getRootPane());
+    } else {
+      moveRobber();
+    }
+  }
+
+  public void handleSevenRollAfterRemovingResources(
+    ResourceRemovalWindow window
+  ) {
+    ResourceMultiChoiceController controller = window.getController();
+    mainViewPane.getChildren().remove(controller.getRootPane());
+    tearDownFrontdrop();
+    loadInterfaceFor(Players.getCurrentPlayer());
+    moveRobber();
+  }
+
+  public void moveRobber() {
+    RobberPlacementController robberController = new RobberPlacementController(
+      this
+    );
+    backdrop.setFill(ROBBER_PLACEMENT_COLOR);
+
+    setButtonState(ButtonState.BUILD_COUNTABLE);
+    robberController.bindMouse();
+  }
+
+  public void finishMovingRobber() {
+    backdrop.setFill(Color.WHITE);
+    renderRobber();
+
+    Player currentPlayer = Players.getCurrentPlayer();
+
+    HashSet<Player> attackedPlayers = new HashSet<>();
+    for (Building building : Board.getBuildingsNextToRobberPosition()) {
+      Player buildingOwner = building.getOwner();
+      if (buildingOwner != currentPlayer) {
+        attackedPlayers.add(buildingOwner);
+      }
+    }
+
+    ResourceCardMap currentResourceHand = currentPlayer.getResourceHand();
+    for (Player player : attackedPlayers) {
+      ResourceCardMap resourceHand = player.getResourceHand();
+      int chosen = rng.nextInt(resourceHand.size());
+      ResourceCard chosenCard = null;
+      for (ResourceCard card : ResourceCard.values()) {
+        chosen -= resourceHand.get(card);
+        if (chosen < 0) {
+          chosenCard = card;
+          break;
+        }
+      }
+
+      if (chosenCard == null) {
+        throw new RuntimeException("chosenCard is null");
+      }
+
+      resourceHand.remove(chosenCard, 1);
+      currentResourceHand.add(chosenCard, 1);
+    }
+
+    loadInterfaceFor(currentPlayer);
+    setButtonState(ButtonState.DEFAULT);
+  }
+
+  private void gatherResourcesForRollValue(int rollValue) {
+    for (TileSlot tile : Board.getTilesForRollValue(rollValue)) {
+      if (
+        !(tile.kind instanceof ResourceCard) ||
+        Board.getRobberPosition().equals(tile.position)
+      ) continue;
+
+      ResourceCard resourceCard = (ResourceCard) tile.kind;
+
+      for (Building building : Board.getBuildingsAroundTile(tile)) {
+        building.getOwner().getResourceHand().add(resourceCard);
+      }
+    }
+    loadCardsFor(Players.getCurrentPlayer());
   }
 
   @FXML
-  private void initialize() {
-    buildableRenderer = new BuildableRenderer(mapPane);
-
-    Game.startGame();
-
-    renderMap();
-    initializePlayers();
-    applyChatSnap();
-
+  private void buyDevelopmentCard() {
     Player currentPlayer = Players.getCurrentPlayer();
+    if (currentPlayer.hasResourcesForDevelopmentCard()) {
+      DevelopmentCard newCard = currentPlayer.pickDevelopmentCard();
 
-    for (int i = 0; i < 5; i++) {
-      currentPlayer.pickDevelopmentCard();
+      developmentCardUpdater.update(currentPlayer.getDevelopmentHand());
+      resourceCardUpdater.update(currentPlayer.getResourceHand().toList());
+
+      Node render = developmentCardUpdater.getRenderForCard(newCard);
+      render.setOnMouseClicked(event -> onDevelopmentCardClicked(newCard));
     }
-
-    // let the player build some settlements
-    currentPlayer.receiveResource(ResourceCard.BRICK);
-    currentPlayer.receiveResource(ResourceCard.WOOD);
-
-    currentPlayer.receiveResources(Settlement.getBlueprint());
-    currentPlayer.receiveResources(Settlement.getBlueprint());
-    currentPlayer.receiveResources(City.getBlueprint());
-
-    // currentPlayer.buildStartingSettlement(new IntPoint(5, 5));
-    // Settlement settlement2 = currentPlayer.buildStartingSettlement(new IntPoint(6, 6));
-
-    // currentPlayer.upgradeSettlement(settlement2);
-
-    displayCards(currentPlayer.getDevelopmentHand());
-    displayCards(currentPlayer.getResourceHand().toList());
-
-    buildableRenderer.updateGraphics(Board.getBuildables());
   }
 
-  private void renderMap() {
-    for (MapSlot[] row : Board.getMap()) {
-      for (MapSlot mapSlot : row) {
-        if (mapSlot == null)
-          continue;
+  private void onPlayerChanged(Player oldPlayer, Player newPlayer) {
+    victoryPointsValueLabel.textProperty().unbind();
+    if (oldPlayer != null) {
+      oldPlayer.victoryPointsProperty().removeListener(victoryPointsListener);
+    }
+    if (newPlayer != null) {
+      victoryPointsValueLabel
+        .textProperty()
+        .bind(newPlayer.victoryPointsProperty().asString("Victory Points: %d"));
+      newPlayer.victoryPointsProperty().addListener(victoryPointsListener);
 
-        Point guiPosition = HexTransform.toGuiSpace(mapSlot.position);
+      loadInterfaceFor(newPlayer);
+    }
+  }
 
-        StackPane slotPane;
-        if (mapSlot instanceof TileSlot) {
-          slotPane = generateTile((TileSlot) mapSlot);
-        } else if (mapSlot instanceof PortSlot) {
-          slotPane = generatePort((PortSlot) mapSlot);
-        } else {
-          throw new RuntimeException("MapSlot kind not found");
-        }
+  private ChangeListener<Number> victoryPointsListener = ChangeListenerBuilder.from(
+    this::onVictoryPointsChanged
+  );
 
-        slotPane.setLayoutX(guiPosition.x - 25);
-        slotPane.setLayoutY(guiPosition.y);
-        slotPane.setAlignment(Pos.CENTER);
-        
-        mapPane.getChildren().add(slotPane);
+  private void onVictoryPointsChanged(Number newVictoryPoints) {
+    if (!(newVictoryPoints instanceof Integer)) {
+      throw new RuntimeException("This value is not of type Integer");
+    }
+
+    int intVictoryPoints = (int) newVictoryPoints;
+
+    if (intVictoryPoints >= 10) {
+      try {
+        endGame();
+      } catch (IOException e) {
+        throw new RuntimeException(e);
       }
     }
   }
 
-  private StackPane generateTile(TileSlot tile) {
-    StackPane result = new StackPane();
-
-    attachTileImageView(tile, result);
-
-    if (tile.rollValue != -1) {
-      attachRollValueLabel(tile, result);
-    }
-
-    return result;
+  public Pane getRoadPane() {
+    return roadPane;
   }
 
-  private void attachTileImageView(TileSlot tile, Pane parentPane) {
-    Image tileImage = tile.kind.getTileImage();
-    ImageView tileImageView = new ImageView(tileImage);
-    fitImageViewToTile(tileImageView);
-    parentPane.getChildren().add(tileImageView);
+  public RoadPaneUpdater getRoadPaneUpdater() {
+    return roadPaneUpdater;
   }
 
-  private void attachRollValueLabel(TileSlot tile, Pane parentPane) {
-    Circle rollValueShape = new Circle(15);
-    rollValueShape.setFill(Color.WHITE);
-
-    Label rollValueLabel = new Label(String.valueOf(tile.rollValue));
-
-    parentPane.getChildren().addAll(rollValueShape, rollValueLabel);
-  }
-  
-  private void fitImageViewToTile(ImageView imageView) {
-    imageView.setFitWidth(TILE_SIZE);
-    imageView.setFitHeight(TILE_SIZE * TILE_ASPECT_RATIO);
+  public BuildingPaneUpdater getBuildingPaneUpdater() {
+    return buildingPaneUpdater;
   }
 
-  private StackPane generatePort(PortSlot port) {
-    StackPane result = new StackPane();
-    fitPaneToTile(result);
-
-    attachPortConnectorPane(port, result);
-    
-    attachPortImage(port, result);
-
-    return result;
-  }
-  
-  private void fitPaneToTile(Pane pane) {
-    pane.setPrefWidth(TILE_SIZE);
-    pane.setPrefHeight(TILE_SIZE * TILE_ASPECT_RATIO);
+  public CardUpdater<ResourceCard> getResourceCardUpdater() {
+    return resourceCardUpdater;
   }
 
-  private void attachPortConnectorPane(PortSlot port, Pane parentPane) {
-    StackPane result = new StackPane();
-    result.setAlignment(Pos.TOP_CENTER);
-    fitPaneToTile(result);
-
-    ImageView portConnectorImageView = new ImageView(portConnectorImage);
-    fitImageViewToTile(portConnectorImageView);
-
-    Label tradeRatioLabel = new Label(
-        String.format("%d:%d", port.kind.getPortNecessaryCount(), port.kind.getPortRequestedCount()));
-    tradeRatioLabel.setLayoutY(TILE_SIZE / 2);
-    tradeRatioLabel.setFont(new Font("System Bold", 8));
-    tradeRatioLabel.setTextFill(Color.WHITE );
-    tradeRatioLabel.setRotate(180);
-
-    result.setRotate(60 * port.portDirection);
-    result.getChildren().addAll(portConnectorImageView, tradeRatioLabel);
-
-    parentPane.getChildren().add(result);
-  }
-  
-  private void attachPortImage(PortSlot port, Pane parentPane) {
-    Image portImage = port.kind.getPortImage();
-    ImageView result = new ImageView(portImage);
-    result.setFitWidth(TILE_SIZE * 0.6);
-    result.setFitHeight(TILE_SIZE * 0.6);
-
-    parentPane.getChildren().add(result);
+  public CardUpdater<DevelopmentCard> getDevelopmentCardUpdater() {
+    return developmentCardUpdater;
   }
 
-  private void initializePlayers() {
-    Players.currentPlayerProperty().addListener(playerListener);
-
-    Player currentPlayer = Players.getCurrentPlayer();
-    currentPlayer.victoryPointsProperty().addListener(victoryPointsListener);
-
-    int currentVictoryPoints = currentPlayer.getVictoryPoints();
-    victoryPointsValueLabel.setText(String.valueOf(currentVictoryPoints));
+  public StackPane getMainViewPane() {
+    return mainViewPane;
   }
 
-  private ChangeListener<Number> victoryPointsListener = new ChangeListenerBuilder<Number>()
-  .from(
-      (Number oldValue, Number newValue) -> {
-        victoryPointsValueLabel.setText(newValue.toString());
-      }
-    );
-
-  private ChangeListener<Player> playerListener = new ChangeListenerBuilder<Player>()
-  .from(
-      (Player oldValue, Player newValue) -> {
-        if (oldValue != null) {
-          oldValue
-            .victoryPointsProperty()
-            .removeListener(victoryPointsListener);
-        }
-        if (newValue != null) {
-          newValue.victoryPointsProperty().addListener(victoryPointsListener);
-        }
-      }
-    );
-
-  private void applyChatSnap() {
-    chatScrollPane.vvalueProperty().addListener(snapToBottom);
-  }
-
-  private ChangeListener<Number> snapToBottom = new ChangeListenerBuilder<Number>()
-  .from(
-      (Number oldValue, Number newValue) -> {
-        if (shouldSnapVvalue) {
-          shouldSnapVvalue = false;
-          chatScrollPane.setVvalue(1);
-        }
-      }
-      );
-    
-
-  private void displayCards(ResourceCardList cards) {
-    displayCardsOnPane(cards, resourcePane);
-  }
-
-  private void displayCards(DevelopmentCardList cards) {
-    displayCardsOnPane(cards, developmentPane);
-  }
-
-  private <T extends HasCard> void displayCardsOnPane(ArrayList<T> cards, Pane cardPane) {
-    double offsetPerCard = Math.min(80, ((1200.0 - 150) / 2) / cards.size());
-    for (int i = 0; i < cards.size(); i++) {
-      T card = cards.get(i);
-      Image cardImage = card.getCardImage();
-      ImageView cardImageView = new ImageView(cardImage);
-      cardImageView.setFitWidth(100);
-      cardImageView.setFitHeight(100);
-      double offset = offsetPerCard * (i - (cards.size() - 1) / 2.0) - 50;
-      cardImageView.layoutXProperty().bind(cardPane.widthProperty().divide(2.0).add(offset));
-      cardImageView.setLayoutY(0);
-      cardPane.getChildren().add(cardImageView);
-    }
+  public Pane getResourcePane() {
+    return resourcePane;
   }
 }

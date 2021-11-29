@@ -6,9 +6,12 @@ import venusians.util.Images;
 
 public class YearOfPlentyCard extends DevelopmentCard {
 
-  private static final String name = "";
-  private static final String description = "";
-  private static final Image cardImage = Images.load(YearOfPlentyCard.class, "yearOfPlentyChip.png");
+  private static final String name = "Year of Plenty";
+  private static final String description = "Gain 2 resources.";
+  private static final Image cardImage = Images.load(
+    YearOfPlentyCard.class,
+    "yearOfPlentyChip.png"
+  );
 
   public YearOfPlentyCard(Player owner) {
     super(owner);
@@ -27,11 +30,5 @@ public class YearOfPlentyCard extends DevelopmentCard {
   @Override
   public Image getCardImage() {
     return cardImage;
-  }
-
-  @Override
-  public void apply() {
-    // take 2 of any resource.
-    // it can be 2 of the same or 2 different resources
   }
 }

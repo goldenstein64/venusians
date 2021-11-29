@@ -8,7 +8,9 @@ import venusians.data.Game;
 import venusians.data.lifecycle.GameOptions;
 import venusians.data.lifecycle.PlayerProfile;
 
-public class Players {
+public final class Players {
+
+  private Players() {}
 
   private static SecureRandom rng = new SecureRandom();
   private static Player[] allPlayers;
@@ -38,7 +40,7 @@ public class Players {
       allPlayers[i] = new Player(profile.name, profile.color);
     }
   }
-  
+
   private static void shufflePlayers() {
     for (int i = 0; i < allPlayers.length; i++) {
       int choice = rng.nextInt(allPlayers.length);
@@ -61,7 +63,7 @@ public class Players {
     return currentPlayer;
   }
 
-  private static void setCurrentPlayer(Player currentPlayer) {
+  public static void setCurrentPlayer(Player currentPlayer) {
     currentPlayerWrapper.set(currentPlayer);
     Players.currentPlayer = currentPlayer;
   }

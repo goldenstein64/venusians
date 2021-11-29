@@ -7,11 +7,11 @@ import venusians.data.players.Player;
 
 public class Road implements Buildable {
 
-  private static final ResourceCardMap blueprint = new ResourceCardMap();
+  public static final ResourceCardMap BLUEPRINT = new ResourceCardMap();
 
   static {
-    blueprint.put(ResourceCard.WOOD, 1);
-    blueprint.put(ResourceCard.BRICK, 1);
+    BLUEPRINT.put(ResourceCard.WOOD, 1);
+    BLUEPRINT.put(ResourceCard.BRICK, 1);
   }
 
   private IntPoint position1;
@@ -24,13 +24,13 @@ public class Road implements Buildable {
     this.position2 = position2;
   }
 
-  public static ResourceCardMap getBlueprint() {
-    return blueprint;
+  @Override
+  public ResourceCardMap getBlueprint() {
+    return BLUEPRINT;
   }
 
-  @Override
-  public IntPoint getPosition() {
-    return position1;
+  public IntPoint[] getPositions() {
+    return new IntPoint[] { position1, position2 };
   }
 
   public IntPoint getPosition1() {

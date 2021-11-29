@@ -2,17 +2,30 @@ package venusians.data.cards.development;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
-
 import javafx.scene.image.Image;
 import venusians.data.cards.HasCard;
+import venusians.data.cards.resource.ResourceCard;
+import venusians.data.cards.resource.ResourceCardMap;
 import venusians.data.players.Player;
 
 public abstract class DevelopmentCard implements HasCard {
 
+  public static final ResourceCardMap BLUEPRINT = new ResourceCardMap();
+
+  static {
+    BLUEPRINT.add(ResourceCard.WHEAT);
+    BLUEPRINT.add(ResourceCard.WOOL);
+    BLUEPRINT.add(ResourceCard.ORE);
+  }
+
   private static SecureRandom rng = new SecureRandom();
 
   private static enum CardEnum {
-    KNIGHT, MONOPOLY, ROAD_BUILDING, VICTORY_POINT, YEAR_OF_PLENTY;
+    KNIGHT,
+    MONOPOLY,
+    ROAD_BUILDING,
+    VICTORY_POINT,
+    YEAR_OF_PLENTY;
 
     public DevelopmentCard asInstance(Player owner) {
       switch (this) {
@@ -38,7 +51,7 @@ public abstract class DevelopmentCard implements HasCard {
         return MONOPOLY;
       } else if (card instanceof RoadBuildingCard) {
         return ROAD_BUILDING;
-      }else if (card instanceof VictoryPointCard) {
+      } else if (card instanceof VictoryPointCard) {
         return VICTORY_POINT;
       } else if (card instanceof YearOfPlentyCard) {
         return YEAR_OF_PLENTY;
@@ -47,10 +60,13 @@ public abstract class DevelopmentCard implements HasCard {
       }
     }
   }
-  
+
   private static ArrayList<CardEnum> livePool = new ArrayList<CardEnum>();
-  static {
-    // fill the cardPool
+  private static ArrayList<CardEnum> deadPool = new ArrayList<CardEnum>();
+
+  public static void startGame() {
+    deadPool.clear();
+    livePool.clear();
     for (int i = 0; i < 14; i++) {
       livePool.add(CardEnum.KNIGHT);
     }
@@ -72,17 +88,9 @@ public abstract class DevelopmentCard implements HasCard {
     }
   }
 
-  private static ArrayList<CardEnum> deadPool = new ArrayList<CardEnum>();
-
-  protected Player owner;
-
-  public DevelopmentCard(Player owner) {
-    this.owner = owner;
-  }
-
   public static DevelopmentCard pickCard(Player owner) {
-    if (livePool.size() == 0) {
-      reshuffleDeadPile();
+    if (livePool.isEmpty()) {
+      reshuffleDeadPool();
     }
 
     int choice = rng.nextInt(livePool.size());
@@ -101,16 +109,29 @@ public abstract class DevelopmentCard implements HasCard {
     }
   }
 
-  private static void reshuffleDeadPile() {
+  private static void reshuffleDeadPool() {
     livePool.addAll(deadPool);
     deadPool.clear();
+  }
+
+  public static boolean hasCards() {
+    return livePool.size() > 0 || deadPool.size() > 0;
+  }
+
+  protected Player owner;
+
+  public DevelopmentCard(Player owner) {
+    this.owner = owner;
+  }
+
+  public Player getOwner() {
+    return owner;
   }
 
   public abstract String getName();
 
   public abstract String getDescription();
 
+  @Override
   public abstract Image getCardImage();
-
-  public abstract void apply();
 }

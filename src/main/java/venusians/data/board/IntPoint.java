@@ -22,6 +22,7 @@ public class IntPoint extends Point {
     return new IntPoint(this.x - other.x, this.y - other.y);
   }
 
+  @Override
   public IntPoint negative() {
     return new IntPoint(-this.x, -this.y);
   }
@@ -42,6 +43,7 @@ public class IntPoint extends Point {
     return new IntPoint(this.x % other.x, this.y % other.y);
   }
 
+  @Override
   public String toString() {
     return String.format("(%d, %d)", x, y);
   }

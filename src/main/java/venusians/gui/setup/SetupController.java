@@ -52,9 +52,7 @@ public class SetupController {
       new PropertyValueFactory<PlayerProfile, Color>("color")
     );
     colorColumn.setCellFactory(
-      column -> {
-        return new ColorTableCell<PlayerProfile>(column);
-      }
+      column -> new ColorTableCell<PlayerProfile>(column)
     );
     colorColumn.setOnEditCommit(
       event -> {
@@ -66,18 +64,13 @@ public class SetupController {
     profileList =
       FXCollections.observableArrayList(
         new PlayerProfile("James", 0),
-        new PlayerProfile(1),
+        new PlayerProfile("Shannon", 1),
         new PlayerProfile(2),
         new PlayerProfile(3),
         new PlayerProfile(4),
         new PlayerProfile(5)
       );
     playerProfileTable.setItems(profileList);
-  }
-
-  @FXML
-  private void sayHello() throws IOException {
-    System.out.println("Hello");
   }
 
   @FXML

@@ -6,9 +6,13 @@ import venusians.util.Images;
 
 public class MonopolyCard extends DevelopmentCard {
 
-  private static final String name = "";
-  private static final String description = "";
-  private static final Image cardImage = Images.load(MonopolyCard.class, "monopolyChip.png");
+  private static final String name = "Monopoly";
+  private static final String description =
+    "Get 2 Cards of 1 type from everyone else.";
+  private static final Image cardImage = Images.load(
+    MonopolyCard.class,
+    "monopolyChip.png"
+  );
 
   public MonopolyCard(Player owner) {
     super(owner);
@@ -27,12 +31,5 @@ public class MonopolyCard extends DevelopmentCard {
   @Override
   public Image getCardImage() {
     return cardImage;
-  }
-
-  @Override
-  public void apply() {
-    // Declare a resource
-    // every other player must give 2 of that resource
-    // take all of that resource if they have less than 2
   }
 }

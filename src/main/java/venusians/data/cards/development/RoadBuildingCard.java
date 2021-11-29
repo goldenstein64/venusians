@@ -6,9 +6,12 @@ import venusians.util.Images;
 
 public class RoadBuildingCard extends DevelopmentCard {
 
-  private static final String name = "";
-  private static final String description = "";
-  private static final Image cardImage = Images.load(RoadBuildingCard.class, "roadBuildingChip.png");
+  private static final String name = "Road Building";
+  private static final String description = "Build 2 roads.";
+  private static final Image cardImage = Images.load(
+    RoadBuildingCard.class,
+    "roadBuildingChip.png"
+  );
 
   public RoadBuildingCard(Player owner) {
     super(owner);
@@ -27,10 +30,5 @@ public class RoadBuildingCard extends DevelopmentCard {
   @Override
   public Image getCardImage() {
     return cardImage;
-  }
-
-  @Override
-  public void apply() {
-    // place two roads, like they were just built
   }
 }

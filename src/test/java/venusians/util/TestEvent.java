@@ -25,9 +25,7 @@ public class TestEvent {
   void eventCanBeListenedTo() {
     Event<String> stringEvent = new Event<String>();
     Event.Listener<String> connection = stringEvent.connect(
-      (String value) -> {
-        System.out.printf("RECEIVED: %s%n", value);
-      }
+      value -> System.out.printf("RECEIVED: %s%n", value)
     );
 
     assertNotNull(connection);
@@ -39,17 +37,9 @@ public class TestEvent {
 
     int[] obj = new int[] { -1 };
 
-    intEvent.connect(
-      (Integer value) -> {
-        obj[0] += value;
-      }
-    );
+    intEvent.connect((Integer value) -> obj[0] += value);
 
-    intEvent.connect(
-      (Integer value) -> {
-        obj[0] += value;
-      }
-    );
+    intEvent.connect((Integer value) -> obj[0] += value);
 
     intEvent.fire(3);
 
@@ -59,9 +49,7 @@ public class TestEvent {
   void eventCanCheckWhetherListenerIsConnected() {
     Event<String> stringEvent = new Event<String>();
     Event.Listener<String> connection = stringEvent.connect(
-      (String value) -> {
-        System.out.printf("RECEIVED: %s%n", value);
-      }
+      value -> System.out.printf("RECEIVED: %s%n", value)
     );
 
     assertTrue(stringEvent.isConnected(connection));
@@ -71,9 +59,7 @@ public class TestEvent {
   void eventCanBeDisconnected() {
     Event<String> stringEvent = new Event<String>();
     Event.Listener<String> connection = stringEvent.connect(
-      (String value) -> {
-        System.out.printf("RECEIVED: %s%n", value);
-      }
+      value -> System.out.printf("RECEIVED: %s%n", value)
     );
 
     assertTrue(stringEvent.isConnected(connection));
@@ -89,11 +75,7 @@ public class TestEvent {
 
     int[] obj = new int[] { -1 };
 
-    intEvent.connect(
-      (Integer value) -> {
-        obj[0] = value;
-      }
-    );
+    intEvent.connect(value -> obj[0] = value);
 
     intEvent.fire(5);
 
@@ -107,9 +89,7 @@ public class TestEvent {
     int[] obj = new int[] { -1 };
 
     Event.Listener<Integer> connection = intEvent.connect(
-      (Integer value) -> {
-        obj[0] = value;
-      }
+      value -> obj[0] = value
     );
 
     intEvent.fire(1);

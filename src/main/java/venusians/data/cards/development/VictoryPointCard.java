@@ -7,8 +7,11 @@ import venusians.util.Images;
 public class VictoryPointCard extends DevelopmentCard {
 
   private static final String name = "Victory Point";
-  private static final String description = "";
-  private static final Image cardImage = Images.load(VictoryPointCard.class, "victoryPointChip.png");
+  private static final String description = "Gain 1 Victory Point.";
+  private static final Image cardImage = Images.load(
+    VictoryPointCard.class,
+    "victoryPointChip.png"
+  );
 
   public VictoryPointCard(Player owner) {
     super(owner);
@@ -27,10 +30,5 @@ public class VictoryPointCard extends DevelopmentCard {
   @Override
   public Image getCardImage() {
     return cardImage;
-  }
-
-  @Override
-  public void apply() {
-    owner.incrementVictoryPoints();
   }
 }

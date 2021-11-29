@@ -18,6 +18,7 @@ public enum ExtraTileKind implements TileKind {
     }
   }
 
+  @Override
   public Image getTileImage() {
     return tileImage;
   }
