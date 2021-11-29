@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+
+<StackPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="venusians.gui.main.artists.resourceChoice.ResourceChoiceController">
+   <children>
+      <Rectangle fill="WHITE" height="150.0" stroke="BLACK" strokeType="INSIDE" width="600.0" />
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0">
+         <children>
+            <Label fx:id="captionLabel" text="Choose a resource to trade for:" />
+            <HBox alignment="CENTER" spacing="10.0">
+               <children>
+                  <ImageView fx:id="brickButton" fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../data/cards/resource/brickCard.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="oreButton" fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../data/cards/resource/oreCard.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="wheatButton" fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../data/cards/resource/wheatCard.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="woodButton" fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../data/cards/resource/woodCard.png" />
+                     </image>
+                  </ImageView>
+                  <ImageView fx:id="woolButton" fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../data/cards/resource/woolCard.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </HBox>
+            <Button fx:id="cancelButton" mnemonicParsing="false" text="Cancel" />
+         </children>
+      </VBox>
+   </children>
+</StackPane>
