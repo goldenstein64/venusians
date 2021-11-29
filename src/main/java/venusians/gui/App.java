@@ -13,11 +13,13 @@ import javafx.stage.Stage;
 public class App extends Application {
 
   private static Scene scene;
+  private static Stage stage;
 
   /** Describes what happens when the window is first initialized. */
   @Override
   public void start(Stage stage) throws IOException {
-    scene = new Scene(loadFXML("setup"), 1200, 600);
+    App.stage = stage;
+    scene = new Scene(loadFXML("setup"));
     stage.setScene(scene);
     stage.setTitle("The Venusians");
     stage.show();
@@ -32,7 +34,12 @@ public class App extends Application {
     FXMLLoader fxmlLoader = new FXMLLoader(
       App.class.getResource(fxml + ".fxml")
     );
-    return fxmlLoader.load();
+    return fxmlLoader.<Parent>load();
+  }
+
+  /** Closes the window and exits the program */
+  public static void close() {
+    stage.close();
   }
 
   /**
