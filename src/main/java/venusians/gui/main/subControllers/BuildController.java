@@ -374,7 +374,10 @@ public class BuildController {
 
   private void suggestRoad(Point newMousePosition) {
     Point hexMousePosition = HexTransform.guiToHexSpace(newMousePosition);
-    IntPoint hexMouseCorner = HexTransform.hexToHexCorner(hexMousePosition);
+    IntPoint hexMouseCorner = HexTransform.hexEstimateHexCorner(
+      startingHexRoadPosition,
+      hexMousePosition
+    );
 
     if (
       Board.positionIsNextToTile(startingHexRoadPosition) &&
@@ -383,7 +386,9 @@ public class BuildController {
         positionHasSuggestedRoad(startingHexRoadPosition) ||
         positionHasSuggestedRoad(hexMouseCorner)
       ) &&
-      getSuggestedRoadBetween(startingHexRoadPosition, hexMouseCorner) == null
+      getSuggestedRoadBetween(startingHexRoadPosition, hexMouseCorner) ==
+      null &&
+      Board.getRoadBetween(startingHexRoadPosition, hexMouseCorner) == null
     ) {
       Road road = new Road(
         currentPlayer,
