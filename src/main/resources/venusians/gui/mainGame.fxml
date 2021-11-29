@@ -37,6 +37,7 @@
                   </HBox>
                   <Button fx:id="buyDevelopmentCardButton" disable="true" mnemonicParsing="false" onAction="#buyDevelopmentCard" text="Buy Development Card" />
                   <Button fx:id="tradeButton" disable="true" onAction="#createTradeDraft" text="Trade" />
+                  <Button fx:id="selfTradeButton" mnemonicParsing="false" onAction="#tradeWithSelf" text="Trade 4:1" />
                </children>
             </VBox>
          </right>
@@ -65,8 +66,6 @@
                      </content>
                   </TitledPane>
                   <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                  <Button fx:id="endTurnButton" alignment="CENTER" disable="true" onAction="#endTurn" text="End Turn" />
-                  <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                   <VBox alignment="CENTER">
                      <children>
                         <Label fx:id="currentPlayerLabel">
@@ -90,6 +89,7 @@
                   <Pane fx:id="developmentPane" prefHeight="80.0" prefWidth="50.0" HBox.hgrow="ALWAYS" />
                   <VBox alignment="CENTER" prefWidth="100.0" spacing="20.0">
                      <children>
+                        <Button fx:id="endTurnButton" alignment="CENTER" disable="true" onAction="#endTurn" text="End Turn" />
                         <Button fx:id="diceRollButton" disable="true" minWidth="75.0" mnemonicParsing="false" onAction="#rollDice" text="Roll Dice" />
                         <Label fx:id="rollResultLabel" />
                      </children>
