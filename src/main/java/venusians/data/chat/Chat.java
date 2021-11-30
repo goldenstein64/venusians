@@ -13,6 +13,10 @@ public final class Chat {
 
   private static EventHandler<MessageEvent> onChatted;
 
+  public static void startGame() {
+    messages = new ArrayDeque<>();
+  }
+
   public static void add(Message message) {
     messages.add(message);
     if (messages.size() > MESSAGE_LIMIT) {

@@ -4,6 +4,7 @@ import venusians.data.board.Board;
 import venusians.data.cards.development.DevelopmentCard;
 import venusians.data.cards.special.LargestArmyCard;
 import venusians.data.cards.special.LongestRoadCard;
+import venusians.data.chat.Chat;
 import venusians.data.lifecycle.GameOptions;
 import venusians.data.lifecycle.GameResults;
 import venusians.data.players.Players;
@@ -46,6 +47,7 @@ public final class Game {
     DevelopmentCard.startGame();
     LargestArmyCard.startGame();
     LongestRoadCard.startGame();
+    Chat.startGame();
   }
 
   /**
