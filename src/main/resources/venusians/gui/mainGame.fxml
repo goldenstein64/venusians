@@ -37,7 +37,7 @@
                   </HBox>
                   <Button fx:id="buyDevelopmentCardButton" disable="true" mnemonicParsing="false" onAction="#buyDevelopmentCard" text="Buy Development Card" />
                   <Button fx:id="tradeButton" disable="true" onAction="#createTradeDraft" text="Trade" />
-                  <Button fx:id="selfTradeButton" mnemonicParsing="false" onAction="#tradeWithSelf" text="Trade 4:1" />
+                  <Button fx:id="selfTradeButton" disable="true" mnemonicParsing="false" onAction="#tradeWithSelf" text="Trade 4:1" />
                </children>
             </VBox>
          </right>
