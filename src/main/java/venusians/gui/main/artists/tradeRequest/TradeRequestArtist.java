@@ -41,6 +41,10 @@ public class TradeRequestArtist {
       label.setText(String.valueOf(subject.requestedResources.get(card)));
     }
 
+    controller
+      .getAuthorLabel()
+      .setText(String.format("%s wants to", subject.merchant.getName()));
+
     return controller;
   }
 }

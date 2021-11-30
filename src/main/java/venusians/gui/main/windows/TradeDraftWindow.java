@@ -15,7 +15,7 @@ import venusians.data.players.Players;
 import venusians.gui.main.artists.tradeDraft.TradeDraftArtist;
 import venusians.gui.main.artists.tradeDraft.TradeDraftController;
 
-public class TradeWindow {
+public class TradeDraftWindow {
 
   private class GiveTextFieldListener implements ChangeListener<String> {
 
@@ -42,6 +42,12 @@ public class TradeWindow {
           field.setText(oldValue);
           return;
         }
+      }
+
+      ResourceCardMap resourceHand = currentPlayer.getResourceHand();
+      if (!resourceHand.contains(card, newIntValue)) {
+        field.setText(oldValue);
+        return;
       }
 
       tradeRequest.requestedResources.put(card, newIntValue);
@@ -73,12 +79,6 @@ public class TradeWindow {
           field.setText(oldValue);
           return;
         }
-
-        ResourceCardMap resourceHand = currentPlayer.getResourceHand();
-        if (!resourceHand.contains(card, newIntValue)) {
-          field.setText(oldValue);
-          return;
-        }
       }
 
       tradeRequest.necessaryResources.put(card, newIntValue);
@@ -93,7 +93,7 @@ public class TradeWindow {
   private Runnable onOfferDiscarded;
   private StackPane tradePane;
 
-  public TradeWindow() {
+  public TradeDraftWindow() {
     this.currentPlayer = Players.getCurrentPlayer();
     this.tradeRequest = new TradeRequest(currentPlayer);
 
@@ -101,19 +101,23 @@ public class TradeWindow {
 
     fillListeners(controller);
 
-    this.tradePane = controller.getRender();
+    this.tradePane = controller.getRootPane();
 
     controller.getCancelButton().setOnAction(this::cancelOffer);
     controller.getCreateOfferButton().setOnAction(this::createOffer);
+    controller
+      .getAuthorLabel()
+      .setText(String.format("%s wants to", currentPlayer.getName()));
   }
 
-  public TradeWindow(TradeRequest oldOffer) {
+  public TradeDraftWindow(TradeRequest oldOffer) {
     this();
     tradeRequest.setNecessaryResources(oldOffer.getRequestedResources());
     tradeRequest.setRequestedResources(oldOffer.getNecessaryResources());
   }
 
   private void fillListeners(TradeDraftController controller) {
+    ResourceCardMap resourceHand = currentPlayer.getResourceHand();
     for (ResourceCard card : ResourceCard.values()) {
       TextField giveField = controller.giveFieldMap.get(card);
       ChangeListener<String> giveListener = new GiveTextFieldListener(
@@ -121,6 +125,7 @@ public class TradeWindow {
         giveField
       );
       giveField.textProperty().addListener(giveListener);
+      giveField.setPromptText(String.format("0-%d", resourceHand.get(card)));
 
       TextField forField = controller.forFieldMap.get(card);
       ChangeListener<String> forListener = new ForTextFieldListener(

@@ -51,6 +51,9 @@ public class TradeRequestController {
   private Button cancelButton;
 
   @FXML
+  private Label authorLabel;
+
+  @FXML
   private StackPane rootPane;
 
   public HashMap<ResourceCard, Label> forLabelMap = new HashMap<>();
@@ -100,6 +103,10 @@ public class TradeRequestController {
 
   public StackPane getRootPane() {
     return rootPane;
+  }
+
+  public Label getAuthorLabel() {
+    return authorLabel;
   }
 
   public void setTradeRequest(TradeRequest tradeRequest) {

@@ -71,7 +71,7 @@ import venusians.gui.main.windows.PortTradeWindow;
 import venusians.gui.main.windows.ResourceAdditionWindow;
 import venusians.gui.main.windows.ResourceRemovalWindow;
 import venusians.gui.main.windows.SelfTradeWindow;
-import venusians.gui.main.windows.TradeWindow;
+import venusians.gui.main.windows.TradeDraftWindow;
 
 public class MainGameController {
 
@@ -598,16 +598,16 @@ public class MainGameController {
 
   @FXML
   private void createTradeDraft() {
-    TradeWindow tradeWindow = new TradeWindow();
+    TradeDraftWindow tradeWindow = new TradeDraftWindow();
     setUpTradeWindow(tradeWindow);
   }
 
   private void createTradeDraft(TradeRequest offer) {
-    TradeWindow tradeWindow = new TradeWindow(offer);
+    TradeDraftWindow tradeWindow = new TradeDraftWindow(offer);
     setUpTradeWindow(tradeWindow);
   }
 
-  private void setUpTradeWindow(TradeWindow tradeWindow) {
+  private void setUpTradeWindow(TradeDraftWindow tradeWindow) {
     setButtonState(ButtonState.MODAL);
 
     tradeWindow.setOnOfferCreated(this::onOfferCreated);

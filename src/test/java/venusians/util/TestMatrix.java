@@ -1,11 +1,14 @@
 package venusians.util;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Iterator;
 import org.junit.jupiter.api.Test;
+import venusians.data.board.IntPoint;
 
 public class TestMatrix {
 
@@ -14,6 +17,28 @@ public class TestMatrix {
     Matrix<String> matrix = new Matrix<>(10, 10);
 
     assertTrue(matrix.isEmpty());
+  }
+
+  @Test
+  void elementCanBePlaced() {
+    Matrix<String> matrix = new Matrix<>(10, 10);
+
+    assertDoesNotThrow(
+      () -> {
+        matrix.put(0, 0, "Hello");
+      }
+    );
+  }
+
+  @Test
+  void elementCanBePlacedUsingIntPoint() {
+    Matrix<String> matrix = new Matrix<>(10, 10);
+
+    assertDoesNotThrow(
+      () -> {
+        matrix.put(new IntPoint(0, 0), "hello");
+      }
+    );
   }
 
   @Test
@@ -76,5 +101,32 @@ public class TestMatrix {
     matrix.put(6, 4, "foo");
 
     assertEquals(matrix.get(6, 4), "foo");
+  }
+
+  @Test
+  void emptyMatrixCanBeIteratedThroughWithGenericFor() {
+    Matrix<String> matrix = new Matrix<>(10, 10);
+
+    assertDoesNotThrow(
+      () -> {
+        for (String value : matrix) {
+          System.out.println(value);
+        }
+      }
+    );
+  }
+
+  @Test
+  void emptyMatrixCanBeIteratedThroughWithIterator() {
+    Matrix<String> matrix = new Matrix<>(10, 10);
+
+    assertDoesNotThrow(
+      () -> {
+        for (Iterator<String> iter = matrix.iterator(); iter.hasNext();) {
+          String value = iter.next();
+          System.out.println(value);
+        }
+      }
+    );
   }
 }

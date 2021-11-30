@@ -23,6 +23,7 @@ public class Matrix<T> implements Collection<T> {
       }
     }
 
+    @Override
     public boolean hasNext() {
       while (!columnIterator.hasNext() && rowIterator.hasNext()) {
         ArrayList<T> row = rowIterator.next();
@@ -32,6 +33,7 @@ public class Matrix<T> implements Collection<T> {
       return rowIterator.hasNext();
     }
 
+    @Override
     public T next() {
       while (!columnIterator.hasNext() && rowIterator.hasNext()) {
         ArrayList<T> row = rowIterator.next();

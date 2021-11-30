@@ -3,11 +3,15 @@ package venusians.gui.main.artists.tradeDraft;
 import java.util.HashMap;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import venusians.data.cards.resource.ResourceCard;
 
 public class TradeDraftController {
+
+  @FXML
+  private Label authorLabel;
 
   @FXML
   private Button cancelButton;
@@ -46,7 +50,7 @@ public class TradeDraftController {
   private TextField giveWoolField;
 
   @FXML
-  private StackPane render;
+  private StackPane rootPane;
 
   public HashMap<ResourceCard, TextField> giveFieldMap = new HashMap<>();
   public HashMap<ResourceCard, TextField> forFieldMap = new HashMap<>();
@@ -66,8 +70,8 @@ public class TradeDraftController {
     forFieldMap.put(ResourceCard.WOOL, forWoolField);
   }
 
-  public StackPane getRender() {
-    return render;
+  public StackPane getRootPane() {
+    return rootPane;
   }
 
   public Button getCancelButton() {
@@ -76,5 +80,9 @@ public class TradeDraftController {
 
   public Button getCreateOfferButton() {
     return createOfferButton;
+  }
+
+  public Label getAuthorLabel() {
+    return authorLabel;
   }
 }
