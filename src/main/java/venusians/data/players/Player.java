@@ -12,6 +12,7 @@ import venusians.data.cards.TradeRequest;
 import venusians.data.cards.development.DevelopmentCard;
 import venusians.data.cards.development.DevelopmentCardList;
 import venusians.data.cards.development.KnightCard;
+import venusians.data.cards.development.VictoryPointCard;
 import venusians.data.cards.resource.ResourceCard;
 import venusians.data.cards.resource.ResourceCardMap;
 import venusians.data.cards.special.LargestArmyCard;
@@ -131,6 +132,9 @@ public class Player implements HasName {
     DevelopmentCard card = DevelopmentCard.pickCard(this);
     resourceHand.remove(DevelopmentCard.BLUEPRINT);
     developmentHand.add(card);
+    if (card instanceof VictoryPointCard) {
+      addVictoryPoints(1);
+    }
     return card;
   }
 
