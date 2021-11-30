@@ -31,14 +31,14 @@ public class TradeRequestArtist {
       ResourceCard card = entry.getKey();
       Label label = entry.getValue();
 
-      label.setText(String.valueOf(subject.necessaryResources.get(card)));
+      label.setText(String.valueOf(subject.requestedResources.get(card)));
     }
 
     for (Entry<ResourceCard, Label> entry : controller.forLabelMap.entrySet()) {
       ResourceCard card = entry.getKey();
       Label label = entry.getValue();
 
-      label.setText(String.valueOf(subject.requestedResources.get(card)));
+      label.setText(String.valueOf(subject.necessaryResources.get(card)));
     }
 
     controller

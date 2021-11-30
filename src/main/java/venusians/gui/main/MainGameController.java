@@ -699,7 +699,7 @@ public class MainGameController {
     Player merchant = offer.merchant;
 
     merchant.tradeWith(customer, offer);
-    resourceCardUpdater.update();
+    loadCardsFor(customer);
   }
 
   @FXML
