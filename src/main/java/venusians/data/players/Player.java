@@ -33,7 +33,7 @@ public class Player implements HasName {
   private int roadPool = 15;
   private int settlementPool = 5;
   private int cityPool = 4;
-  private PlayerResources resources = new PlayerResources();
+  private ResourceCardMap resourceHand = new ResourceCardMap();
   private int victoryPoints = 0;
   private int knightsPlayed = 0;
   private ReadOnlyIntegerWrapper victoryPointsWrapper;
@@ -57,7 +57,7 @@ public class Player implements HasName {
   }
 
   public ResourceCardMap getResourceHand() {
-    return resources.getResourceHand();
+    return resourceHand;
   }
 
   public int getVictoryPoints() {
@@ -79,11 +79,11 @@ public class Player implements HasName {
   }
 
   public void tradeWith(Player other, TradeRequest tradeRequest) {
-    if (!this.resources.contains(tradeRequest.necessaryResources)) {
+    if (!this.resourceHand.contains(tradeRequest.necessaryResources)) {
       throw new RuntimeException(
         "This player does not have necessary resources for this trade."
       );
-    } else if (!other.resources.contains(tradeRequest.requestedResources)) {
+    } else if (!other.resourceHand.contains(tradeRequest.requestedResources)) {
       throw new RuntimeException(
         "Other player does not have requested resources for this trade."
       );
@@ -103,33 +103,33 @@ public class Player implements HasName {
       ResourceCard card = entry.getKey();
       int value = entry.getValue();
 
-      this.resources.remove(card, value);
-      to.resources.add(card, value);
+      this.resourceHand.remove(card, value);
+      to.resourceHand.add(card, value);
     }
   }
 
   public boolean hasResourcesForRoad() {
-    return roadPool > 0 && resources.contains(Road.BLUEPRINT);
+    return roadPool > 0 && resourceHand.contains(Road.BLUEPRINT);
   }
 
   public boolean hasResourcesForSettlement() {
-    return settlementPool > 0 && resources.contains(Settlement.BLUEPRINT);
+    return settlementPool > 0 && resourceHand.contains(Settlement.BLUEPRINT);
   }
 
   public boolean hasResourcesForCity() {
-    return cityPool > 0 && resources.contains(City.BLUEPRINT);
+    return cityPool > 0 && resourceHand.contains(City.BLUEPRINT);
   }
 
   public boolean hasResourcesForDevelopmentCard() {
     return (
       DevelopmentCard.hasCards() &&
-      resources.contains(DevelopmentCard.BLUEPRINT)
+      resourceHand.contains(DevelopmentCard.BLUEPRINT)
     );
   }
 
   public DevelopmentCard pickDevelopmentCard() {
     DevelopmentCard card = DevelopmentCard.pickCard(this);
-    resources.remove(DevelopmentCard.BLUEPRINT);
+    resourceHand.remove(DevelopmentCard.BLUEPRINT);
     developmentHand.add(card);
     return card;
   }
