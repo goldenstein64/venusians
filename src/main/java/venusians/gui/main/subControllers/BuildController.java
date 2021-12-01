@@ -513,8 +513,8 @@ public class BuildController {
     updateCards();
   }
 
-  private <T extends Building> void registerBuildingNoPreview(
-    SuggestedBuildable<T> suggestedBuilding
+  private void registerBuildingNoPreview(
+    SuggestedBuildable<? extends Building> suggestedBuilding
   ) {
     Building building = suggestedBuilding.getBuildable();
     IntPoint position = building.getPosition();
@@ -524,16 +524,16 @@ public class BuildController {
     currentResourceHand.remove(building.getBlueprint());
   }
 
-  private <T extends Building> void unregisterBuilding(
-    SuggestedBuildable<T> suggestedBuilding
+  private void unregisterBuilding(
+    SuggestedBuildable<? extends Building> suggestedBuilding
   ) {
     unregisterBuildingNoPreview(suggestedBuilding);
     updatePreview();
     updateCards();
   }
 
-  private <T extends Building> void unregisterBuildingNoPreview(
-    SuggestedBuildable<T> suggestedBuilding
+  private void unregisterBuildingNoPreview(
+    SuggestedBuildable<? extends Building> suggestedBuilding
   ) {
     Building building = suggestedBuilding.getBuildable();
     IntPoint position = building.getPosition();
